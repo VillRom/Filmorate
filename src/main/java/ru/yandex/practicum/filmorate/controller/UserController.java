@@ -19,7 +19,7 @@ import java.util.Map;
 public class UserController {
     private final Validation validation = new Validation();
 
-    private final Map<Integer, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
 
     @GetMapping
     public ResponseEntity<List<User>> getFilms() {
@@ -29,17 +29,20 @@ public class UserController {
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
         try {
-            validation.validationUser(user);
             if (user.getName().isEmpty()) {
                 user.setName(user.getLogin());
             }
+            if (user.getId() == 0) {
+                user.setId(1);
+            }
+            validation.validationUser(user);
             if (user.getId() < 0) {
                 throw new AccountNotFoundException();
             }
             users.put(user.getId(), user);
             log.info("Добавлен user: {}", user.toString());
         } catch (ValidationException e) {
-            log.warn("Выпало исключение ValidationException User: {}", e.getMessage());
+            log.warn("Исключение! ValidationException User: {}", e.getMessage());
             return ResponseEntity.badRequest().body(user);
         } catch (AccountNotFoundException e) {
             return ResponseEntity.internalServerError().body(user);
@@ -52,27 +55,19 @@ public class UserController {
         try {
             if (users.containsKey(user.getId())) {
                 validation.validationUser(user);
-                if (!users.get(user.getId()).getLogin().equals(user.getLogin())) {
-                    users.get(user.getId()).setLogin(user.getLogin());
-                    log.info("Логин пользователя c id {} изменён на {}", user.getId(), user.getLogin());
+                if (user.getName().isEmpty()) {
+                    user.setName(user.getLogin());
                 }
-                if (!users.get(user.getId()).getEmail().equals(user.getEmail())) {
-                    users.get(user.getId()).setEmail(user.getEmail());
-                    log.info("email пользователя c id {} изменён на {}", user.getId(), user.getEmail());
+                if (user.getId() < 0) {
+                    throw new AccountNotFoundException();
                 }
-                if (!users.get(user.getId()).getName().equals(user.getName())) {
-                    users.get(user.getId()).setName(user.getName());
-                    log.info("имя пользователя c id {} изменено на {}", user.getId(), user.getName());
-                }
-                if (!users.get(user.getId()).getBirthday().equals(user.getBirthday())) {
-                    users.get(user.getId()).setBirthday(user.getBirthday());
-                    log.info("дата рождения пользователя c id {} изменено на {}", user.getId(), user.getBirthday());
-                }
+                users.put(user.getId(), user);
+                log.info("Обновлен пользователь user: {}", users.get(user.getId()));
             } else {
                 throw new AccountNotFoundException();
             }
         } catch (ValidationException e) {
-            log.warn("Выпало исключение ValidationException User: {}", e.getMessage());
+            log.warn("Исключение! ValidationException User: {}", e.getMessage());
             return ResponseEntity.badRequest().body(user);
         } catch (AccountNotFoundException e) {
             return ResponseEntity.internalServerError().body(user);

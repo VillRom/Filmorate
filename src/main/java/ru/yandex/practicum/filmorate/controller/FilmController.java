@@ -20,7 +20,7 @@ public class FilmController {
 
     private final Validation validation = new Validation();
 
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final Map<Long, Film> films = new HashMap<>();
 
     @GetMapping
     public ResponseEntity<List<Film>> getFilms() {
@@ -30,11 +30,14 @@ public class FilmController {
     @PostMapping
     public ResponseEntity<Film> createFilm(@RequestBody Film film) {
         try {
+            if (film.getId() == 0) {
+                film.setId(1);
+            }
             validation.validationFilm(film);
             films.put(film.getId(), film);
             log.info("Добавлен film: {}", film.toString());
-        }catch (ValidationException e) {
-            log.warn("Выпало исключение ValidationException Film: {}", e.getMessage());
+        } catch (ValidationException e) {
+            log.warn("Исключение! ValidationException Film: {}", e.getMessage());
             return ResponseEntity.badRequest().body(film);
         }
         return ResponseEntity.ok(film);
@@ -45,20 +48,14 @@ public class FilmController {
     public ResponseEntity<Film> updateFilm(@RequestBody Film film) throws ValidationException {
         try {
             if (films.containsKey(film.getId())) {
-                if (!films.get(film.getId()).getDescription().equals(film.getDescription())) {
-                    films.get(film.getId()).setDescription(film.getDescription());
-                } if (!films.get(film.getId()).getName().equals(film.getName())) {
-                    films.get(film.getId()).setName(film.getName());
-                } if (films.get(film.getId()).getDuration() != film.getDuration()) {
-                    films.get(film.getId()).setDuration(film.getDuration());
-                } if (!films.get(film.getId()).getReleaseDate().equals(film.getReleaseDate())) {
-                    films.get(film.getId()).setReleaseDate(film.getReleaseDate());
-                }
+                validation.validationFilm(film);
+                films.put(film.getId(), film);
+                log.info("Обновлен фильм film: {}", films.get(film.getId()));
             } else {
                 throw new AccountNotFoundException();
             }
         } catch (ValidationException e) {
-            log.warn("Выпало исключение ValidationException Film: {}", e.getMessage());
+            log.warn("Исключение! ValidationException Film: {}", e.getMessage());
             return ResponseEntity.badRequest().body(film);
         } catch (AccountNotFoundException e) {
             return ResponseEntity.internalServerError().body(film);
