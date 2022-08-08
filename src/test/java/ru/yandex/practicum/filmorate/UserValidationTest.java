@@ -15,8 +15,13 @@ public class UserValidationTest {
 
     @BeforeEach
     public void createTestUser() {
-        user = new User("email@yandex.ru", "Login", "Name", LocalDate.of(2005,05,
-                15));
+        user = User.builder()
+                .login("Login")
+                .name("Name")
+                .email("login@yandex.ru")
+                .birthday(LocalDate.of(2005,05,12))
+                .id(1)
+                .build();
     }
 
     @Test

@@ -15,8 +15,13 @@ public class FilmValidationTest {
 
     @BeforeEach
     public void createTestFilm() {
-        film = new Film("Film", "description", LocalDate.of(1985,10,14),
-                82);
+        film = Film.builder()
+                .description("description")
+                .name("name")
+                .releaseDate(LocalDate.of(2001,06,05))
+                .duration(85)
+                .id(2)
+                .build();
     }
 
     @Test
