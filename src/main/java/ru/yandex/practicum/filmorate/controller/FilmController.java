@@ -19,6 +19,7 @@ import java.util.Map;
 public class FilmController {
 
     private final Validation validation = new Validation();
+    private long filmId = 1;
 
     private final Map<Long, Film> films = new HashMap<>();
 
@@ -30,10 +31,9 @@ public class FilmController {
     @PostMapping
     public ResponseEntity<Film> createFilm(@RequestBody Film film) {
         try {
-            if (film.getId() == 0) {
-                film.setId(1);
-            }
             validation.validationFilm(film);
+            film.setId(filmId);
+            filmId++;
             films.put(film.getId(), film);
             log.info("Добавлен film: {}", film.toString());
         } catch (ValidationException e) {

@@ -18,6 +18,7 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
     private final Validation validation = new Validation();
+    private long userId = 1;
 
     private final Map<Long, User> users = new HashMap<>();
 
@@ -32,20 +33,14 @@ public class UserController {
             if (user.getName().isEmpty()) {
                 user.setName(user.getLogin());
             }
-            if (user.getId() == 0) {
-                user.setId(1);
-            }
             validation.validationUser(user);
-            if (user.getId() < 0) {
-                throw new AccountNotFoundException();
-            }
+            user.setId(userId);
+            userId++;
             users.put(user.getId(), user);
             log.info("Добавлен user: {}", user.toString());
         } catch (ValidationException e) {
             log.warn("Исключение! ValidationException User: {}", e.getMessage());
             return ResponseEntity.badRequest().body(user);
-        } catch (AccountNotFoundException e) {
-            return ResponseEntity.internalServerError().body(user);
         }
         return ResponseEntity.ok(user);
     }
