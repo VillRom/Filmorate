@@ -1,21 +1,61 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import validation.Validation;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
-
+@Slf4j
 @Service
 public class UserService {
+    private final Validation validation = new Validation();
     private final InMemoryUserStorage userStorage;
 
     @Autowired
     public UserService(InMemoryUserStorage userStorage) {
         this.userStorage = userStorage;
+    }
+    public User createUser(User user) {
+        if (user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
+        validation.validationUser(user);
+        userStorage.createUser(user);
+        log.info("Добавлен user: {}", user.toString());
+        return user;
+    }
+
+    public User updateUser(User user) throws AccountNotFoundException {
+        if (userStorage.getUserFromId(user.getId()) != null) {
+            validation.validationUser(user);
+            if (user.getName().isEmpty()) {
+                user.setName(user.getLogin());
+            }
+            if (user.getId() < 0) {
+                throw new AccountNotFoundException();
+            }
+            userStorage.updateUser(user);
+            log.info("Обновлен пользователь user: {}", userStorage.getUserFromId(user.getId()));
+        } else {
+            throw new AccountNotFoundException();
+        }
+        return user;
+    }
+
+    public List<User> getUsers() {
+        return userStorage.getUsers();
+    }
+
+    public User getUserFromId(long userId) throws AccountNotFoundException {
+        if (userStorage.getUserFromId(userId) == null || userId <= 0) {
+            throw new AccountNotFoundException();
+        }
+        return userStorage.getUserFromId(userId);
     }
 
     public void addFriend(long id, long idFriend) throws AccountNotFoundException {
@@ -27,7 +67,7 @@ public class UserService {
         }
     }
 
-    public List<User> getFriends(long id) throws AccountNotFoundException {
+    public List<User> getFriends(long id) {
         List<User> listFriends = new ArrayList<>();
         for (long idFriend : userStorage.getUserFromId(id).getListFriends()){
             listFriends.add(userStorage.getUserFromId(idFriend));
@@ -35,7 +75,7 @@ public class UserService {
         return listFriends;
     }
 
-    public List<User> getListOfMutualFriends(long id, long otherId) throws AccountNotFoundException {
+    public List<User> getListOfMutualFriends(long id, long otherId) {
         List<User> mutualFriends = new ArrayList<>();
         if (userStorage.getUserFromId(id).getListFriends() == null || userStorage.getUserFromId(otherId)
                 .getListFriends() == null) {
@@ -52,7 +92,7 @@ public class UserService {
         }
     }
 
-    public void deleteFriend(long id, long friendId) throws AccountNotFoundException {
+    public void deleteFriend(long id, long friendId) {
         userStorage.getUserFromId(id).getListFriends().remove(friendId);
     }
 
