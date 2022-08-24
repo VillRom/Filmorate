@@ -5,61 +5,82 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import validation.Validation;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Slf4j
 @RequestMapping("/films")
 public class FilmController {
+    private final FilmService filmService;
 
-    private final Validation validation = new Validation();
-    private long filmId = 1;
-
-    private final Map<Long, Film> films = new HashMap<>();
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Film>> getFilms() {
-        return ResponseEntity.ok(new ArrayList<>(films.values()));
+        return ResponseEntity.ok(filmService.getFilms());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Film> getFilmFromId(@PathVariable long id) {
+        try {
+            return ResponseEntity.ok(filmService.getFilmFromId(id));
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/popular")
+    public ResponseEntity<List> getSortedFilms(@RequestParam(required = false) Integer count) {
+        if(count != null) {
+            return ResponseEntity.ok(filmService.getSortedFilms(count));
+        } else {
+            return ResponseEntity.ok(filmService.getSortedFilms(10));
+        }
     }
 
     @PostMapping
     public ResponseEntity<Film> createFilm(@RequestBody Film film) {
         try {
-            validation.validationFilm(film);
-            film.setId(filmId);
-            filmId++;
-            films.put(film.getId(), film);
-            log.info("Добавлен film: {}", film.toString());
+            return ResponseEntity.ok(filmService.createFilm(film));
         } catch (ValidationException e) {
             log.warn("Исключение! ValidationException Film: {}", e.getMessage());
             return ResponseEntity.badRequest().body(film);
         }
-        return ResponseEntity.ok(film);
     }
 
-
     @PutMapping
-    public ResponseEntity<Film> updateFilm(@RequestBody Film film) throws ValidationException {
+    public ResponseEntity<Film> updateFilm(@RequestBody Film film) {
         try {
-            if (films.containsKey(film.getId())) {
-                validation.validationFilm(film);
-                films.put(film.getId(), film);
-                log.info("Обновлен фильм film: {}", films.get(film.getId()));
-            } else {
-                throw new AccountNotFoundException();
-            }
+            return ResponseEntity.ok(filmService.updateFilm(film));
         } catch (ValidationException e) {
             log.warn("Исключение! ValidationException Film: {}", e.getMessage());
             return ResponseEntity.badRequest().body(film);
         } catch (AccountNotFoundException e) {
-            return ResponseEntity.internalServerError().body(film);
+            log.warn("Исключение! AccountNotFoundException Film: {}", e.getMessage());
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(film);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public ResponseEntity<Film> addLike(@PathVariable long id, @PathVariable long userId)
+            throws AccountNotFoundException {
+        filmService.addLike(id, userId);
+        return ResponseEntity.ok(filmService.getFilmFromId(id));
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public ResponseEntity<Film> deleteLike(@PathVariable long id, @PathVariable long userId)
+            throws AccountNotFoundException {
+        try {
+            filmService.deleteLike(id, userId);
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(filmService.getFilmFromId(id));
     }
 }

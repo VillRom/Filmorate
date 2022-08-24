@@ -5,68 +5,85 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import validation.Validation;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.security.auth.login.AccountNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
-    private final Validation validation = new Validation();
-    private long userId = 1;
+    private final UserService userService;
 
-    private final Map<Long, User> users = new HashMap<>();
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
-    public ResponseEntity<List<User>> getFilms() {
-        return ResponseEntity.ok(new ArrayList<>(users.values()));
+    public ResponseEntity<List<User>> getUsers() {
+        return ResponseEntity.ok(userService.getUsers());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserFromId(@PathVariable long id) {
+        try {
+            return ResponseEntity.ok(userService.getUserFromId(id));
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{id}/friends")
+    public ResponseEntity<List<User>> getFriends(@PathVariable long id) {
+        return ResponseEntity.ok(userService.getFriends(id));
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public ResponseEntity<List<User>> getListOfMutualFriends(@PathVariable long id, @PathVariable long otherId) {
+        return ResponseEntity.ok(userService.getListOfMutualFriends(id, otherId));
     }
 
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
         try {
-            if (user.getName().isEmpty()) {
-                user.setName(user.getLogin());
-            }
-            validation.validationUser(user);
-            user.setId(userId);
-            userId++;
-            users.put(user.getId(), user);
-            log.info("Добавлен user: {}", user.toString());
+            return ResponseEntity.ok(userService.createUser(user));
         } catch (ValidationException e) {
             log.warn("Исключение! ValidationException User: {}", e.getMessage());
             return ResponseEntity.badRequest().body(user);
         }
-        return ResponseEntity.ok(user);
     }
 
     @PutMapping
     public ResponseEntity<User> updateUser(@RequestBody User user) {
         try {
-            if (users.containsKey(user.getId())) {
-                validation.validationUser(user);
-                if (user.getName().isEmpty()) {
-                    user.setName(user.getLogin());
-                }
-                if (user.getId() < 0) {
-                    throw new AccountNotFoundException();
-                }
-                users.put(user.getId(), user);
-                log.info("Обновлен пользователь user: {}", users.get(user.getId()));
-            } else {
-                throw new AccountNotFoundException();
-            }
+            return ResponseEntity.ok(userService.updateUser(user));
         } catch (ValidationException e) {
             log.warn("Исключение! ValidationException User: {}", e.getMessage());
             return ResponseEntity.badRequest().body(user);
         } catch (AccountNotFoundException e) {
-            return ResponseEntity.internalServerError().body(user);
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public ResponseEntity<User> addFriend(@PathVariable long id, @PathVariable long friendId) {
+        try {
+            userService.addFriend(id, friendId);
+            return ResponseEntity.ok(userService.getUserFromId(friendId));
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public ResponseEntity<User> deleteFriend(@PathVariable long id, @PathVariable long friendId) {
+        try {
+            User delete = userService.getUserFromId(friendId);
+            userService.deleteFriend(id, friendId);
+            return ResponseEntity.ok(delete);
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
