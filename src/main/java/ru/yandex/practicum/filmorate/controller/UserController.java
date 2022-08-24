@@ -40,8 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public ResponseEntity<List<User>> getListOfMutualFriends(@PathVariable long id, @PathVariable long otherId)
-            throws AccountNotFoundException {
+    public ResponseEntity<List<User>> getListOfMutualFriends(@PathVariable long id, @PathVariable long otherId) {
         return ResponseEntity.ok(userService.getListOfMutualFriends(id, otherId));
     }
 

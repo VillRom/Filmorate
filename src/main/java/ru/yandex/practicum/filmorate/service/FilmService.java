@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import validation.Validation;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -17,7 +16,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmService(InMemoryFilmStorage filmStorage) {
+    public FilmService(FilmStorage filmStorage) {
         validation = new Validation();
         this.filmStorage = filmStorage;
     }
@@ -54,6 +53,7 @@ public class FilmService {
 
     public void addLike(long id, long userId) {
         filmStorage.getFilmFromId(id).getLikes().add(userId);
+        log.info("Добавлен лайк к фильму " + filmStorage.getFilmFromId(id));
     }
 
     public void deleteLike(long id, long userId) throws AccountNotFoundException {
