@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS mpa,films,genre,film_genre,users,likes,friends CASCADE;
+
 CREATE TABLE IF NOT EXISTS mpa (
     id INTEGER PRIMARY KEY,
     mpa_name varchar(8)
