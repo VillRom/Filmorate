@@ -10,17 +10,18 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Component
+@Component("FilmInMemory")
 public class InMemoryFilmStorage implements FilmStorage {
     private long filmId = 1;
 
     private final Map<Long, Film> films = new HashMap<>();
 
     @Override
-    public void addFilm(Film film) {
+    public Film addFilm(Film film) {
         film.setId(filmId);
         filmId++;
         films.put(film.getId(), film);
+        return film;
     }
 
     @Override
@@ -41,5 +42,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film getFilmFromId(long idFilm) {
         return films.get(idFilm);
+    }
+
+    @Override
+    public void putLikeToFilm(long idFilm, long idUser) {
+        films.get(idFilm).getLikes().add(idUser);
     }
 }

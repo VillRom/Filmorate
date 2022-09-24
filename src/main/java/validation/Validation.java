@@ -24,6 +24,8 @@ public class Validation {
             throw new ValidationException("Дата выхода фильма не может быть раньше 28.12.1895г");
         } else if (film.getDuration() <= 0) {
             throw new ValidationException("Продолжительность фильма не может быть отрицательной");
+        } else if (film.getMpa() == null) {
+            throw new ValidationException("В фильме не указан рейтинг");
         }
     }
 }
