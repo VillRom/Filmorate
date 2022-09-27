@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS genre (
 );
 
 CREATE TABLE IF NOT EXISTS film_genre (
-    film_id INTEGER references films (id),
+    film_id INTEGER references films (id) ON DELETE CASCADE,
     genre_id INTEGER references genre (id)
 );
 CREATE TABLE IF NOT EXISTS users (
@@ -33,12 +33,12 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS likes (
-    id INTEGER references films (id),
-    user_id integer references users (user_id)
+    id INTEGER references films (id) ON DELETE CASCADE,
+    user_id integer references users (user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS friends (
-    user_id INTEGER references users (user_id),
+    user_id INTEGER references users (user_id) ON DELETE CASCADE,
     friends_id integer,
     status boolean
 );

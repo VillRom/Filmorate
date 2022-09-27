@@ -8,7 +8,7 @@ import java.util.Set;
 public interface UserStorage {
     public User createUser(User user);
     public User updateUser(User user);
-    public void deleteUser(int idUser);
+    public void deleteUser(long idUser);
     public List<User> getUsers();
     public User getUserFromId(long userId);
     public void addFriend(long id, long friendId);

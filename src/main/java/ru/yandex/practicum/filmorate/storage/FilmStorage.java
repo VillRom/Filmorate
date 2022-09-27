@@ -8,6 +8,6 @@ public interface FilmStorage {
     public Film updateFilm(Film film);
     public void deleteFilm(long idFilm);
     public List<Film> getFilms();
-    public Film getFilmFromId(long idFilm);
+    public Film getFilmById(long idFilm);
     public void putLikeToFilm(long idFilm, long idUser);
 }

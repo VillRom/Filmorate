@@ -23,7 +23,7 @@ public class GenreStorageTest {
 
     @Test
     public void getGenreFromIdTest() {
-        Genre genreTest = genreDbStorage.getGenreFromId(3);
+        Genre genreTest = genreDbStorage.getGenreById(3);
         Assertions.assertEquals(3, genreTest.getId(), "Идентификатор не совпадает");
         Assertions.assertEquals(genre, genreTest, "Объекты не совпадают");
     }

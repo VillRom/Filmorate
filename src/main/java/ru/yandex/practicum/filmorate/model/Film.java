@@ -36,6 +36,7 @@ public class Film {
             public int compare(Genre o1, Genre o2) {
                 return o1.getId() - o2.getId();
             }});
+        genres.clear();
         genres.addAll(genreList);
     }
 }

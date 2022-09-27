@@ -30,7 +30,7 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public Genre getGenreFromId(Integer id) {
+    public Genre getGenreById(Integer id) {
         SqlRowSet genreRows = jdbcTemplate.queryForRowSet("SELECT * FROM genre WHERE id = ?", id);
         if(genreRows.next()) {
             Genre genre = Genre.builder()

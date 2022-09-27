@@ -15,6 +15,7 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
+    private long id;
 
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
@@ -26,11 +27,20 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Film> getFilmFromId(@PathVariable long id) {
+    public ResponseEntity<Film> getFilmById(@PathVariable long id) {
         try {
-            return ResponseEntity.ok(filmService.getFilmFromId(id));
+            return ResponseEntity.ok(filmService.getFilmById(id));
         } catch (AccountNotFoundException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Film> deleteFilmById(@PathVariable long id) {
+        try {
+            return ResponseEntity.ok(filmService.deleteFilm(id));
+        } catch (AccountNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -70,7 +80,7 @@ public class FilmController {
     public ResponseEntity<Film> addLike(@PathVariable long id, @PathVariable long userId)
             throws AccountNotFoundException {
         filmService.addLike(id, userId);
-        return ResponseEntity.ok(filmService.getFilmFromId(id));
+        return ResponseEntity.ok(filmService.getFilmById(id));
     }
 
     @DeleteMapping("/{id}/like/{userId}")
@@ -81,6 +91,6 @@ public class FilmController {
         } catch (AccountNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(filmService.getFilmFromId(id));
+        return ResponseEntity.ok(filmService.getFilmById(id));
     }
 }

@@ -87,4 +87,13 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<User> deleteUserById(@PathVariable long id) {
+        try {
+            return ResponseEntity.ok(userService.deleteUserById(id));
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

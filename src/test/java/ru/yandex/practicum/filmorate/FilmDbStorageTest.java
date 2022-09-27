@@ -40,7 +40,7 @@ public class FilmDbStorageTest {
     @Test
     public void addFilmTest() {
         filmDbStorage.addFilm(film);
-        Film film1 = filmDbStorage.getFilmFromId(2);
+        Film film1 = filmDbStorage.getFilmById(2);
         Assertions.assertEquals(2, film1.getId(), "Идентификатор не совпадает");
         Assertions.assertEquals("film2", film1.getName(), "Название фильма не совпадает");
         Assertions.assertEquals(120, film1.getDuration(), "Продолжительность фильма не совпадает");
@@ -50,7 +50,7 @@ public class FilmDbStorageTest {
     public void updateFilmTest() {
         film.setDuration(15);
         filmDbStorage.updateFilm(film);
-        Film film1 = filmDbStorage.getFilmFromId(2);
+        Film film1 = filmDbStorage.getFilmById(2);
         Assertions.assertEquals(2, film1.getId(), "Идентификатор не совпадает");
         Assertions.assertEquals("film2", film1.getName(), "Название фильма не совпадает");
         Assertions.assertEquals(15, film1.getDuration(), "Продолжительность фильма не совпадает");
@@ -64,7 +64,7 @@ public class FilmDbStorageTest {
 
     @Test
     public void getFilmFromIdTest() {
-        Film film2 = filmDbStorage.getFilmFromId(1);
+        Film film2 = filmDbStorage.getFilmById(1);
         Assertions.assertEquals(1, film2.getId(), "id фильма не совпадает с ожидаемым");
         Assertions.assertEquals("film1", film2.getName(), "Название фильма не совпадает");
         Assertions.assertEquals(95, film2.getDuration(), "Продолжительность фильма не совпадает");

@@ -23,6 +23,6 @@ public class GenreService {
         if (id <= 0) {
             throw new AccountNotFoundException();
         }
-        return genreStorage.getGenreFromId(id);
+        return genreStorage.getGenreById(id);
     }
 }

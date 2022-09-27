@@ -96,4 +96,13 @@ public class UserService {
         userStorage.deleteFriend(id, friendId);
     }
 
+    public User deleteUserById(long id) throws AccountNotFoundException {
+        if (userStorage.getUserFromId(id) == null || id <= 0) {
+            throw new AccountNotFoundException();
+        }
+        User user = userStorage.getUserFromId(id);
+        userStorage.deleteUser(id);
+        log.info("Удален пользователь user: {}", user);
+        return user;
+    }
 }
