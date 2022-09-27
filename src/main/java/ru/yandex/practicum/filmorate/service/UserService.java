@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -17,7 +18,7 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("UserDb") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
     public User createUser(User user) {
@@ -59,17 +60,16 @@ public class UserService {
     }
 
     public void addFriend(long id, long idFriend) throws AccountNotFoundException {
-        if(idFriend <= 0) {
+        if(id <= 0 || idFriend <= 0) {
             throw new AccountNotFoundException();
         } else {
-            userStorage.getUserFromId(id).addFriend(idFriend);
-            userStorage.getUserFromId(idFriend).addFriend(id);
+            userStorage.addFriend(id, idFriend);
         }
     }
 
     public List<User> getFriends(long id) {
         List<User> listFriends = new ArrayList<>();
-        for (long idFriend : userStorage.getUserFromId(id).getListFriends()){
+        for (long idFriend : userStorage.getSetListFriends(id)){
             listFriends.add(userStorage.getUserFromId(idFriend));
         }
         return listFriends;
@@ -81,8 +81,8 @@ public class UserService {
                 .getListFriends() == null) {
             return null;
         } else {
-            for (Long idUser : userStorage.getUserFromId(id).getListFriends()) {
-                for (Long idOtherUser : userStorage.getUserFromId(otherId).getListFriends()) {
+            for (Long idUser : userStorage.getSetListFriends(id)) {
+                for (Long idOtherUser : userStorage.getSetListFriends(otherId)) {
                     if (idUser.equals(idOtherUser)) {
                         mutualFriends.add(userStorage.getUserFromId(idUser));
                     }
@@ -93,7 +93,16 @@ public class UserService {
     }
 
     public void deleteFriend(long id, long friendId) {
-        userStorage.getUserFromId(id).getListFriends().remove(friendId);
+        userStorage.deleteFriend(id, friendId);
     }
 
+    public User deleteUserById(long id) throws AccountNotFoundException {
+        if (userStorage.getUserFromId(id) == null || id <= 0) {
+            throw new AccountNotFoundException();
+        }
+        User user = userStorage.getUserFromId(id);
+        userStorage.deleteUser(id);
+        log.info("Удален пользователь user: {}", user);
+        return user;
+    }
 }

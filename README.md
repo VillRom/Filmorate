@@ -1,5 +1,5 @@
 # java-filmorate
-![Filmorate SQL](images/Filmorate SQL.png)
+![Filmorate SQL](images\Filmorate SQL.png)
 
 Пример запроса на получение всех фильмов: \
 SELECT *\

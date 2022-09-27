@@ -14,6 +14,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
+
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -82,6 +83,15 @@ public class UserController {
             User delete = userService.getUserFromId(friendId);
             userService.deleteFriend(id, friendId);
             return ResponseEntity.ok(delete);
+        } catch (AccountNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<User> deleteUserById(@PathVariable long id) {
+        try {
+            return ResponseEntity.ok(userService.deleteUserById(id));
         } catch (AccountNotFoundException e) {
             return ResponseEntity.notFound().build();
         }

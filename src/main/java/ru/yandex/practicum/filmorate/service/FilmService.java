@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -16,7 +17,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(@Qualifier("FilmDb") FilmStorage filmStorage) {
         validation = new Validation();
         this.filmStorage = filmStorage;
     }
@@ -34,33 +35,33 @@ public class FilmService {
 
 
     public Film updateFilm(Film film) throws AccountNotFoundException {
-        if (filmStorage.getFilmFromId(film.getId()) != null) {
+        if (filmStorage.getFilmById(film.getId()) != null) {
             validation.validationFilm(film);
-            filmStorage.updateFilm(film);
-            log.info("Обновлен фильм film: {}", filmStorage.getFilmFromId(film.getId()));
+            log.info("Обновлен фильм film: {}", filmStorage.getFilmById(film.getId()));
+            return filmStorage.updateFilm(film);
         } else {
             throw new AccountNotFoundException();
         }
-        return film;
     }
 
-    public Film getFilmFromId(long idFilm) throws AccountNotFoundException {
-        if (filmStorage.getFilmFromId(idFilm) == null || idFilm <= 0) {
+    public Film getFilmById(long idFilm) throws AccountNotFoundException {
+        if (filmStorage.getFilmById(idFilm) == null || idFilm <= 0) {
             throw new AccountNotFoundException();
         }
-        return filmStorage.getFilmFromId(idFilm);
+        return filmStorage.getFilmById(idFilm);
     }
 
     public void addLike(long id, long userId) {
-        filmStorage.getFilmFromId(id).getLikes().add(userId);
-        log.info("Добавлен лайк к фильму " + filmStorage.getFilmFromId(id));
+        filmStorage.putLikeToFilm(id, userId);
+        log.info("Добавлен лайк к фильму " + filmStorage.getFilmById(id));
     }
 
     public void deleteLike(long id, long userId) throws AccountNotFoundException {
         if (userId <= 0) {
             throw new AccountNotFoundException();
         }
-        filmStorage.getFilmFromId(id).getLikes().remove(userId);
+        filmStorage.getFilmById(id).getLikes().remove(userId);
+        log.info("Удален лайк пользователя с id-" + userId + " к фильму " + filmStorage.getFilmById(id));
     }
 
     public List<Film> getSortedFilms(int count) {
@@ -76,5 +77,15 @@ public class FilmService {
         } else {
             return sortedFilms.subList(0, count);
         }
+    }
+
+    public Film deleteFilm( long idFilm) throws AccountNotFoundException {
+        if (filmStorage.getFilmById(idFilm) == null || idFilm <= 0) {
+            throw new AccountNotFoundException();
+        }
+        Film film = filmStorage.getFilmById(idFilm);
+        filmStorage.deleteFilm(idFilm);
+        log.info("Удален фильм " + film);
+        return film;
     }
 }
