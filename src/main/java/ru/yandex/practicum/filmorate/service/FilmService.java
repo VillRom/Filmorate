@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import validation.Validation;
 
-import javax.security.auth.login.AccountNotFoundException;
 import java.util.*;
 @Slf4j
 @Service
@@ -34,19 +34,19 @@ public class FilmService {
     }
 
 
-    public Film updateFilm(Film film) throws AccountNotFoundException {
+    public Film updateFilm(Film film) throws AccountNotFound {
         if (filmStorage.getFilmById(film.getId()) != null) {
             validation.validationFilm(film);
             log.info("Обновлен фильм film: {}", filmStorage.getFilmById(film.getId()));
             return filmStorage.updateFilm(film);
         } else {
-            throw new AccountNotFoundException();
+            throw new AccountNotFound("Фильм с id = " + film.getId() + " не найден");
         }
     }
 
-    public Film getFilmById(long idFilm) throws AccountNotFoundException {
+    public Film getFilmById(long idFilm) throws AccountNotFound {
         if (filmStorage.getFilmById(idFilm) == null || idFilm <= 0) {
-            throw new AccountNotFoundException();
+            throw new AccountNotFound("Фильм с id = " + idFilm + " не найден");
         }
         return filmStorage.getFilmById(idFilm);
     }
@@ -56,9 +56,9 @@ public class FilmService {
         log.info("Добавлен лайк к фильму " + filmStorage.getFilmById(id));
     }
 
-    public void deleteLike(long id, long userId) throws AccountNotFoundException {
+    public void deleteLike(long id, long userId) throws AccountNotFound {
         if (userId <= 0) {
-            throw new AccountNotFoundException();
+            throw new AccountNotFound("Пользователь с id = " + userId + " не найден");
         }
         filmStorage.getFilmById(id).getLikes().remove(userId);
         log.info("Удален лайк пользователя с id-" + userId + " к фильму " + filmStorage.getFilmById(id));
@@ -79,9 +79,9 @@ public class FilmService {
         }
     }
 
-    public Film deleteFilm( long idFilm) throws AccountNotFoundException {
+    public Film deleteFilm( long idFilm) throws AccountNotFound {
         if (filmStorage.getFilmById(idFilm) == null || idFilm <= 0) {
-            throw new AccountNotFoundException();
+            throw new AccountNotFound("Фильм с id = " + idFilm + " не найден");
         }
         Film film = filmStorage.getFilmById(idFilm);
         filmStorage.deleteFilm(idFilm);

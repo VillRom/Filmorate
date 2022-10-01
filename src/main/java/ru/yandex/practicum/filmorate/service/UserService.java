@@ -4,11 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import validation.Validation;
 
-import javax.security.auth.login.AccountNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 @Slf4j
@@ -31,19 +31,19 @@ public class UserService {
         return user;
     }
 
-    public User updateUser(User user) throws AccountNotFoundException {
+    public User updateUser(User user) throws AccountNotFound {
         if (userStorage.getUserFromId(user.getId()) != null) {
             validation.validationUser(user);
             if (user.getName().isEmpty()) {
                 user.setName(user.getLogin());
             }
             if (user.getId() < 0) {
-                throw new AccountNotFoundException();
+                throw new AccountNotFound("Пользователь с id = " + user.getId() + " не найден");
             }
             userStorage.updateUser(user);
             log.info("Обновлен пользователь user: {}", userStorage.getUserFromId(user.getId()));
         } else {
-            throw new AccountNotFoundException();
+            throw new AccountNotFound("Пользователь с id = " + user.getId() + " не найден");
         }
         return user;
     }
@@ -52,16 +52,16 @@ public class UserService {
         return userStorage.getUsers();
     }
 
-    public User getUserFromId(long userId) throws AccountNotFoundException {
+    public User getUserFromId(long userId) throws AccountNotFound {
         if (userStorage.getUserFromId(userId) == null || userId <= 0) {
-            throw new AccountNotFoundException();
+            throw new AccountNotFound("Пользователь с id = " + userId + " не найден");
         }
         return userStorage.getUserFromId(userId);
     }
 
-    public void addFriend(long id, long idFriend) throws AccountNotFoundException {
+    public void addFriend(long id, long idFriend) throws AccountNotFound {
         if(id <= 0 || idFriend <= 0) {
-            throw new AccountNotFoundException();
+            throw new AccountNotFound("Пользователи с id = " + id + " " + idFriend + " не найдены");
         } else {
             userStorage.addFriend(id, idFriend);
         }
@@ -96,9 +96,9 @@ public class UserService {
         userStorage.deleteFriend(id, friendId);
     }
 
-    public User deleteUserById(long id) throws AccountNotFoundException {
+    public User deleteUserById(long id) throws AccountNotFound {
         if (userStorage.getUserFromId(id) == null || id <= 0) {
-            throw new AccountNotFoundException();
+            throw new AccountNotFound("Пользователь с id = " + id + " не найден");
         }
         User user = userStorage.getUserFromId(id);
         userStorage.deleteUser(id);
