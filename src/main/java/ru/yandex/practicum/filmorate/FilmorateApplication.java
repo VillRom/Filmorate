@@ -8,6 +8,8 @@ public class FilmorateApplication {
 
 	// GSBoldyrev test commit
 
+
+
 	public static void main(String[] args) {
 		SpringApplication.run(FilmorateApplication.class, args);
 	}
