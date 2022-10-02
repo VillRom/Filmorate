@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface GenreStorage {
     public List<Genre> getAllGenre();
-    public Genre getGenreById(Integer id) throws AccountNotFoundException;
+    public Genre getGenreById(Integer id);
 }

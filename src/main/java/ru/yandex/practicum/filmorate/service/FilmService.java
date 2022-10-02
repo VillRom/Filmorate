@@ -60,7 +60,7 @@ public class FilmService {
         if (userId <= 0) {
             throw new AccountNotFound("Пользователь с id = " + userId + " не найден");
         }
-        filmStorage.getFilmById(id).getLikes().remove(userId);
+        filmStorage.deleteLikeToFilm(id, userId);
         log.info("Удален лайк пользователя с id-" + userId + " к фильму " + filmStorage.getFilmById(id));
     }
 
@@ -87,5 +87,14 @@ public class FilmService {
         filmStorage.deleteFilm(idFilm);
         log.info("Удален фильм " + film);
         return film;
+    }
+
+    public List<Film> getSortedFilmsByDirector(long idDirector, String sort) {
+        if(sort.equals("year")) {
+            return filmStorage.getSortedFilmsByDirectorOrderYear(idDirector);
+        } else if (sort.equals("likes")) {
+            return filmStorage.getSortedFilmsByDirectorOrderLikes(idDirector);
+        }
+        return null;
     }
 }
