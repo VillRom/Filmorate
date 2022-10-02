@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
+import validation.Validation;
 
 import java.util.List;
 
@@ -12,9 +13,11 @@ import java.util.List;
 @Slf4j
 public class DirectorService {
 
+    private final Validation validation;
     private final DirectorStorage directorStorage;
 
     public DirectorService(DirectorStorage directorStorage) {
+        validation = new Validation();
         this.directorStorage = directorStorage;
     }
 
@@ -30,7 +33,8 @@ public class DirectorService {
     }
 
     public Director addDirector(Director director) {
-        log.info("Добавлен новый режиссер {}", director);
+        validation.validationDirector(director);
+        log.info("Добавлен новый режиссер {}", director.getName());
         return directorStorage.createDirector(director);
     }
 

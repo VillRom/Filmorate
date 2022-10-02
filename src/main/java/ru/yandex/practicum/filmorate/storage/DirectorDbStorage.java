@@ -53,13 +53,13 @@ public class DirectorDbStorage implements DirectorStorage {
     @Override
     public Director createDirector(Director director) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        String sql = "INSERT INTO directors (id, name)" + " VALUES (?, ?)";
+        String sql = "INSERT INTO directors (name)" + " VALUES (?)";
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement statement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                statement.setLong(1, director.getId());
-                statement.setString(2, director.getName());
+                //statement.setLong(1, director.getId());
+                statement.setString(1, director.getName());
                 return statement;
             }
         }, keyHolder);

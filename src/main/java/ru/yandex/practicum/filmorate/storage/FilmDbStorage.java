@@ -48,8 +48,8 @@ public class FilmDbStorage implements FilmStorage{
         if(!film.getGenres().isEmpty()) {
             fillingTableFilmGenre(idFilm, film.getGenres());
         }
-        if(!film.getDirector().isEmpty()) {
-            fillingTableFilmDirectors(idFilm, film.getDirector());
+        if(!film.getDirectors().isEmpty()) {
+            fillingTableFilmDirectors(idFilm, film.getDirectors());
         }
         return film;
     }
@@ -99,13 +99,14 @@ public class FilmDbStorage implements FilmStorage{
         jdbcTemplate.update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
                 film.getMpa().getId(), film.getId());
         fillingTableFilmGenre(film.getId(), film.getGenres());
-        fillingTableFilmDirectors(film.getId(), film.getDirector());
+        fillingTableFilmDirectors(film.getId(), film.getDirectors());
         if(!film.getGenres().isEmpty()) {
             film.setGenres(getGenreToFilm(film.getId()));
         }
-        if(!film.getDirector().isEmpty()) {
+        if(!film.getDirectors().isEmpty()) {
             film.setDirector(getDirectorToFilm(film.getId()));
         }
+        film.setLikes(getLikesToFilm(film.getId()));
         return film;
     }
 
@@ -219,7 +220,7 @@ public class FilmDbStorage implements FilmStorage{
     @Override
     public List<Film> getSortedFilmsByDirectorOrderLikes(long idDirector) {
         String sql = "SELECT f.*, m.*, COUNT(l.id) AS order_likes FROM films AS f JOIN film_directors AS fd ON f.id=fd.film_id " +
-                "JOIN mpa AS m ON f.mpa_id=m.id " + "JOIN likes AS l ON f.id=l.id " +
+                "JOIN mpa AS m ON f.mpa_id=m.id " + "LEFT JOIN likes AS l ON f.id=l.id " +
                 "WHERE fd.director_id = " + idDirector + " GROUP BY f.id Order BY order_likes DESC ";
         return jdbcTemplate.query(sql, this::mapRowToFilm);
     }

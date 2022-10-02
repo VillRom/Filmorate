@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import validation.Validation;
 
@@ -16,10 +17,13 @@ public class FilmService {
     private final Validation validation;
     private final FilmStorage filmStorage;
 
+    private final DirectorStorage directorStorage;
+
     @Autowired
-    public FilmService(@Qualifier("FilmDb") FilmStorage filmStorage) {
+    public FilmService(@Qualifier("FilmDb") FilmStorage filmStorage, DirectorStorage directorStorage) {
         validation = new Validation();
         this.filmStorage = filmStorage;
+        this.directorStorage = directorStorage;
     }
 
     public Film createFilm(Film film) {
@@ -89,7 +93,10 @@ public class FilmService {
         return film;
     }
 
-    public List<Film> getSortedFilmsByDirector(long idDirector, String sort) {
+    public List<Film> getSortedFilmsByDirector(long idDirector, String sort) throws AccountNotFound {
+        if (directorStorage.getDirector(idDirector) == null || idDirector <= 0) {
+            throw new AccountNotFound("Режисер с id = " + idDirector + " не найден");
+        }
         if(sort.equals("year")) {
             return filmStorage.getSortedFilmsByDirectorOrderYear(idDirector);
         } else if (sort.equals("likes")) {

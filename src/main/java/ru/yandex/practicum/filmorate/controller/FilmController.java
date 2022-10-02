@@ -67,7 +67,7 @@ public class FilmController {
     }
     @GetMapping("/director/{directorId}")
     public Collection<Film> getFilmsByDirectorOrder(@PathVariable long directorId,
-                                                    @RequestParam String sortBy) {
+                                                    @RequestParam String sortBy) throws AccountNotFound {
         return filmService.getSortedFilmsByDirector(directorId, sortBy);
     }
 

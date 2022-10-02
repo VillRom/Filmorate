@@ -18,7 +18,7 @@ public class Film {
     private Mpa mpa;
     private final Set<Genre> genres = new HashSet<>();
 
-    private final Set<Director> director = new HashSet<>();
+    private final Set<Director> directors = new HashSet<>();
 
     public Film(long id, String name, LocalDate releaseDate, String description, int duration, Mpa mpa) {
         this.id = id;
@@ -43,8 +43,8 @@ public class Film {
     }
 
     public void setDirector(List<Director> directorList) {
-        director.clear();
-        director.addAll(directorList);
+        directors.clear();
+        directors.addAll(directorList);
     }
 }
 
