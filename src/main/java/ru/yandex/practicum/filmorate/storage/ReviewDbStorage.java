@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.dao;
+package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,11 +14,11 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class ReviewDaoImpl implements ReviewDao{
+public class ReviewDbStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public ReviewDaoImpl(JdbcTemplate jdbcTemplate) {
+    public ReviewDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -55,10 +55,10 @@ public class ReviewDaoImpl implements ReviewDao{
     }
 
     @Override
-    public int delete(int id) {
+    public void delete(int id) {
         String sqlQuery = "DELETE FROM REVIEWS WHERE REVIEW_ID = ?";
 
-        return jdbcTemplate.update(sqlQuery, id);
+        jdbcTemplate.update(sqlQuery, id);
     }
 
     @Override
@@ -85,25 +85,6 @@ public class ReviewDaoImpl implements ReviewDao{
         return jdbcTemplate.query(sqlQuery, this::mapRowToReview, id, count);
     }
 
-    @Override
-    public void addLike(int id) {
-        String sqlQuery = "UPDATE REVIEWS SET USEFUL = USEFUL + 1 WHERE REVIEW_ID = ?";
-        int result = jdbcTemplate.update(sqlQuery, id);
-        if (result != 1) {
-            throw new NotFoundException("Отзыв по ID " + id + " не найден!");
-        }
-
-    }
-
-    @Override
-    public void removeLike(int id) {
-        String sqlQuery = "UPDATE REVIEWS SET USEFUL = USEFUL - 1 WHERE REVIEW_ID = ?";
-        int result = jdbcTemplate.update(sqlQuery, id);
-        if (result != 1) {
-            throw new NotFoundException("Отзыв по ID " + id + " не найден!");
-        }
-
-    }
 
     private Review mapRowToReview(ResultSet resultSet, int rowNum) throws SQLException {
         Review review = new Review(resultSet.getString("content"),

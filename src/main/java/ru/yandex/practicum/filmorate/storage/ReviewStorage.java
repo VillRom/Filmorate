@@ -1,26 +1,20 @@
-package ru.yandex.practicum.filmorate.dao;
+package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
 
-public interface ReviewDao {
+public interface ReviewStorage {
 
     Review add(Review review);
 
     Review update(Review review);
 
-    int delete(int id);
+    void delete(int id);
 
     Review get(int id);
 
     List<Review> getAll(int count);
 
     List<Review> getForFilm(int id, int count);
-
-    void addLike(int id);
-
-    void removeLike(int id);
-
-
 }

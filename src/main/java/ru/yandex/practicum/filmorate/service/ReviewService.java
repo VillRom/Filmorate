@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dao.ReviewDao;
+import ru.yandex.practicum.filmorate.storage.ReviewStorage;
+import ru.yandex.practicum.filmorate.storage.ReviewLikesStorage;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -12,12 +13,14 @@ import java.util.List;
 @Service
 public class ReviewService {
 
-    private final ReviewDao reviewDao;
+    private final ReviewStorage reviewStorage;
+    private final ReviewLikesStorage reviewLikesStorage;
     private final UserStorage users;
     private final FilmStorage films;
 
-    public ReviewService(ReviewDao reviewDao, UserStorage users, FilmStorage films) {
-        this.reviewDao = reviewDao;
+    public ReviewService(ReviewStorage reviewStorage, ReviewLikesStorage reviewLikesStorage, UserStorage users, FilmStorage films) {
+        this.reviewStorage = reviewStorage;
+        this.reviewLikesStorage = reviewLikesStorage;
         this.users = users;
         this.films = films;
     }
@@ -29,7 +32,7 @@ public class ReviewService {
         if (films.getFilmById(review.getFilmId()) == null) {
             throw new NotFoundException("Фильм по ID " + review.getFilmId() + " не найден!");
         }
-        return reviewDao.add(review);
+        return reviewStorage.add(review);
     }
 
     public Review update(Review review) {
@@ -39,29 +42,37 @@ public class ReviewService {
         if (films.getFilmById(review.getFilmId()) == null) {
             throw new NotFoundException("Фильм по ID " + review.getFilmId() + " не найден!");
         }
-        return reviewDao.update(review);
+        return reviewStorage.update(review);
     }
 
     public void delete(int id) {
-        reviewDao.delete(id);
+        reviewStorage.delete(id);
     }
 
     public Review get(int id) {
-        return reviewDao.get(id);
+        return reviewStorage.get(id);
     }
 
     public List<Review> getForFilm(int id, int count) {
         if (id == 0) {
-            return reviewDao.getAll(count);
+            return reviewStorage.getAll(count);
         }
-        return reviewDao.getForFilm(id, count);
+        return reviewStorage.getForFilm(id, count);
     }
 
-    public void addLike(int id) {
-        reviewDao.addLike(id);
+    public void addLike(int reviewId, int userId) {
+        reviewLikesStorage.addLike(reviewId, userId);
     }
 
-    public void removeLike(int id) {
-        reviewDao.removeLike(id);
+    public void addDislike(int reviewId, int userId) {
+        reviewLikesStorage.addDislike(reviewId, userId);
+    }
+
+    public void removeLike(int reviewId, int userId) {
+        reviewLikesStorage.removeLike(reviewId, userId);
+    }
+
+    public void removeDislike(int reviewId, int userId) {
+        reviewLikesStorage.removeDislike(reviewId, userId);
     }
 }
