@@ -1,7 +1,6 @@
 package validation;
 
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -27,12 +26,6 @@ public class Validation {
             throw new ValidationException("Продолжительность фильма не может быть отрицательной");
         } else if (film.getMpa() == null) {
             throw new ValidationException("В фильме не указан рейтинг");
-        }
-    }
-
-    public void validationDirector(Director director) throws ValidationException {
-        if (director.getName().isBlank()) {
-            throw new ValidationException("В имени режисера ничего не указано");
         }
     }
 }

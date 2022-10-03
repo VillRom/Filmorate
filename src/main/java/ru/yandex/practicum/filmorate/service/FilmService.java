@@ -49,7 +49,7 @@ public class FilmService {
     }
 
     public Film getFilmById(long idFilm) throws AccountNotFound {
-        if (filmStorage.getFilmById(idFilm) == null || idFilm <= 0) {
+        if (filmStorage.getFilmById(idFilm) == null) {
             throw new AccountNotFound("Фильм с id = " + idFilm + " не найден");
         }
         return filmStorage.getFilmById(idFilm);
@@ -84,7 +84,7 @@ public class FilmService {
     }
 
     public Film deleteFilm( long idFilm) throws AccountNotFound {
-        if (filmStorage.getFilmById(idFilm) == null || idFilm <= 0) {
+        if (filmStorage.getFilmById(idFilm) == null) {
             throw new AccountNotFound("Фильм с id = " + idFilm + " не найден");
         }
         Film film = filmStorage.getFilmById(idFilm);
@@ -94,7 +94,7 @@ public class FilmService {
     }
 
     public List<Film> getSortedFilmsByDirector(long idDirector, String sort) throws AccountNotFound {
-        if (directorStorage.getDirector(idDirector) == null || idDirector <= 0) {
+        if (directorStorage.getDirector(idDirector) == null) {
             throw new AccountNotFound("Режисер с id = " + idDirector + " не найден");
         }
         if(sort.equals("year")) {

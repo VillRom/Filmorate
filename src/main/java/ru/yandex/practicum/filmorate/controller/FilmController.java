@@ -35,12 +35,8 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection<Film> getSortedFilms(@RequestParam(required = false) Integer count) {
-        if(count != null) {
-            return filmService.getSortedFilms(count);
-        } else {
-            return filmService.getSortedFilms(10);
-        }
+    public Collection<Film> getSortedFilms(@RequestParam(defaultValue = "10") Integer count) {
+        return filmService.getSortedFilms(count);
     }
 
     @PostMapping
@@ -70,5 +66,4 @@ public class FilmController {
                                                     @RequestParam String sortBy) throws AccountNotFound {
         return filmService.getSortedFilmsByDirector(directorId, sortBy);
     }
-
 }

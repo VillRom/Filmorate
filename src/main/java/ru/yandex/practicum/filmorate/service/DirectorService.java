@@ -5,19 +5,15 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
-import validation.Validation;
 
 import java.util.List;
 
 @Service
 @Slf4j
 public class DirectorService {
-
-    private final Validation validation;
     private final DirectorStorage directorStorage;
 
     public DirectorService(DirectorStorage directorStorage) {
-        validation = new Validation();
         this.directorStorage = directorStorage;
     }
 
@@ -26,20 +22,19 @@ public class DirectorService {
     }
 
     public Director getDirectorById(long id) throws AccountNotFound {
-        if(id <= 0 || directorStorage.getDirector(id) == null) {
+        if(directorStorage.getDirector(id) == null) {
             throw new AccountNotFound("Режисер с id = " + id + " не найден");
         }
         return directorStorage.getDirector(id);
     }
 
     public Director addDirector(Director director) {
-        validation.validationDirector(director);
         log.info("Добавлен новый режиссер {}", director.getName());
         return directorStorage.createDirector(director);
     }
 
     public Director updateDirector(Director director) throws AccountNotFound {
-        if(director.getId() <= 0 || directorStorage.getDirector(director.getId()) == null) {
+        if(directorStorage.getDirector(director.getId()) == null) {
             throw new AccountNotFound("Режисер с id = " + director.getId() + " не найден");
         }
         log.info("Изменена запись о режиссере с id = {}", director.getId());
@@ -47,7 +42,7 @@ public class DirectorService {
     }
 
     public void deleteDirectorById(long id) throws AccountNotFound {
-        if(id <= 0 || directorStorage.getDirector(id) == null) {
+        if(directorStorage.getDirector(id) == null) {
             throw new AccountNotFound("Режисер с id = " + id + " не найден");
         }
         directorStorage.deleteDirector(id);
