@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS users
     name          varchar(30),
     birthday_date date,
     friends       integer
+);
 
 
 CREATE TABLE IF NOT EXISTS directors (
