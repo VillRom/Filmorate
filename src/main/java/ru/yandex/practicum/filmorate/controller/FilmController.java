@@ -14,7 +14,6 @@ import java.util.Collection;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
-    private long id;
 
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
@@ -36,12 +35,8 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public Collection getSortedFilms(@RequestParam(required = false) Integer count) {
-        if(count != null) {
-            return filmService.getSortedFilms(count);
-        } else {
-            return filmService.getSortedFilms(10);
-        }
+    public Collection<Film> getSortedFilms(@RequestParam(defaultValue = "10") Integer count) {
+        return filmService.getSortedFilms(count);
     }
 
     @PostMapping
@@ -62,9 +57,13 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film deleteLike(@PathVariable long id, @PathVariable long userId)
-            throws AccountNotFound {
+    public Film deleteLike(@PathVariable long id, @PathVariable long userId) throws AccountNotFound {
         filmService.deleteLike(id, userId);
         return filmService.getFilmById(id);
+    }
+    @GetMapping("/director/{directorId}")
+    public Collection<Film> getFilmsByDirectorOrder(@PathVariable long directorId,
+                                                    @RequestParam String sortBy) throws AccountNotFound {
+        return filmService.getSortedFilmsByDirector(directorId, sortBy);
     }
 }

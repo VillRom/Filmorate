@@ -33,5 +33,4 @@ public class MpaController {
             return ResponseEntity.notFound().build();
         }
     }
-
 }

@@ -10,4 +10,7 @@ public interface FilmStorage {
     public List<Film> getFilms();
     public Film getFilmById(long idFilm);
     public void putLikeToFilm(long idFilm, long idUser);
+    public void deleteLikeToFilm(long idFilm, long idUser);
+    public List<Film> getSortedFilmsByDirectorOrderYear(long idDirector);
+    public List<Film> getSortedFilmsByDirectorOrderLikes(long idDirector);
 }

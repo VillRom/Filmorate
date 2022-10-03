@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import validation.Validation;
 
@@ -16,10 +17,13 @@ public class FilmService {
     private final Validation validation;
     private final FilmStorage filmStorage;
 
+    private final DirectorStorage directorStorage;
+
     @Autowired
-    public FilmService(@Qualifier("FilmDb") FilmStorage filmStorage) {
+    public FilmService(@Qualifier("FilmDb") FilmStorage filmStorage, DirectorStorage directorStorage) {
         validation = new Validation();
         this.filmStorage = filmStorage;
+        this.directorStorage = directorStorage;
     }
 
     public Film createFilm(Film film) {
@@ -45,7 +49,7 @@ public class FilmService {
     }
 
     public Film getFilmById(long idFilm) throws AccountNotFound {
-        if (filmStorage.getFilmById(idFilm) == null || idFilm <= 0) {
+        if (filmStorage.getFilmById(idFilm) == null) {
             throw new AccountNotFound("Фильм с id = " + idFilm + " не найден");
         }
         return filmStorage.getFilmById(idFilm);
@@ -60,7 +64,7 @@ public class FilmService {
         if (userId <= 0) {
             throw new AccountNotFound("Пользователь с id = " + userId + " не найден");
         }
-        filmStorage.getFilmById(id).getLikes().remove(userId);
+        filmStorage.deleteLikeToFilm(id, userId);
         log.info("Удален лайк пользователя с id-" + userId + " к фильму " + filmStorage.getFilmById(id));
     }
 
@@ -80,12 +84,24 @@ public class FilmService {
     }
 
     public Film deleteFilm( long idFilm) throws AccountNotFound {
-        if (filmStorage.getFilmById(idFilm) == null || idFilm <= 0) {
+        if (filmStorage.getFilmById(idFilm) == null) {
             throw new AccountNotFound("Фильм с id = " + idFilm + " не найден");
         }
         Film film = filmStorage.getFilmById(idFilm);
         filmStorage.deleteFilm(idFilm);
         log.info("Удален фильм " + film);
         return film;
+    }
+
+    public List<Film> getSortedFilmsByDirector(long idDirector, String sort) throws AccountNotFound {
+        if (directorStorage.getDirector(idDirector) == null) {
+            throw new AccountNotFound("Режисер с id = " + idDirector + " не найден");
+        }
+        if(sort.equals("year")) {
+            return filmStorage.getSortedFilmsByDirectorOrderYear(idDirector);
+        } else if (sort.equals("likes")) {
+            return filmStorage.getSortedFilmsByDirectorOrderLikes(idDirector);
+        }
+        return null;
     }
 }
