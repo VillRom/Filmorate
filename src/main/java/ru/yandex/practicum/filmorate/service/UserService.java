@@ -53,7 +53,7 @@ public class UserService {
     }
 
     public User getUserFromId(long userId) throws AccountNotFound {
-        if (userStorage.getUserFromId(userId) == null || userId <= 0) {
+        if (userStorage.getUserFromId(userId) == null) {
             throw new AccountNotFound("Пользователь с id = " + userId + " не найден");
         }
         return userStorage.getUserFromId(userId);
@@ -97,7 +97,7 @@ public class UserService {
     }
 
     public User deleteUserById(long id) throws AccountNotFound {
-        if (userStorage.getUserFromId(id) == null || id <= 0) {
+        if (userStorage.getUserFromId(id) == null) {
             throw new AccountNotFound("Пользователь с id = " + id + " не найден");
         }
         User user = userStorage.getUserFromId(id);
