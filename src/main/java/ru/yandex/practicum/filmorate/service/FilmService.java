@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import validation.Validation;
 
 import java.util.*;
+
 @Slf4j
 @Service
 public class FilmService {
@@ -29,7 +30,7 @@ public class FilmService {
     public Film createFilm(Film film) {
         validation.validationFilm(film);
         filmStorage.addFilm(film);
-        log.info("Добавлен film: {}", film.toString());
+        log.info("Добавлен film: {}", film);
         return film;
     }
 
@@ -70,12 +71,7 @@ public class FilmService {
 
     public List<Film> getSortedFilms(int count) {
         List<Film> sortedFilms = filmStorage.getFilms();
-        sortedFilms.sort(new Comparator<Film>() {
-            @Override
-            public int compare(Film o1, Film o2) {
-                return o2.getLikes().size() - o1.getLikes().size();
-            }
-        });
+        sortedFilms.sort((o1, o2) -> o2.getLikes().size() - o1.getLikes().size());
         if (sortedFilms.size() < count) {
             return sortedFilms.subList(0, sortedFilms.size());
         } else {
@@ -83,7 +79,7 @@ public class FilmService {
         }
     }
 
-    public Film deleteFilm( long idFilm) throws AccountNotFound {
+    public Film deleteFilm(long idFilm) throws AccountNotFound {
         if (filmStorage.getFilmById(idFilm) == null) {
             throw new AccountNotFound("Фильм с id = " + idFilm + " не найден");
         }
@@ -97,11 +93,26 @@ public class FilmService {
         if (directorStorage.getDirector(idDirector) == null) {
             throw new AccountNotFound("Режисер с id = " + idDirector + " не найден");
         }
-        if(sort.equals("year")) {
+        if (sort.equals("year")) {
             return filmStorage.getSortedFilmsByDirectorOrderYear(idDirector);
         } else if (sort.equals("likes")) {
             return filmStorage.getSortedFilmsByDirectorOrderLikes(idDirector);
         }
         return null;
+    }
+
+    public List<Film> search(String query, String param) {
+        String newQuery = query.toLowerCase();
+        List<Film> searched;
+        if (param.equals("title")) {
+            searched = filmStorage.search(newQuery, null);
+        } else if (param.equals("director")) {
+            searched = filmStorage.search(null, newQuery);
+        } else {
+            searched = filmStorage.search(newQuery, newQuery);
+        }
+        searched.sort((o1, o2) -> o2.getLikes().size() - o1.getLikes().size());
+
+        return searched;
     }
 }

@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.security.auth.login.AccountNotFoundException;
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -65,5 +66,10 @@ public class FilmController {
     public Collection<Film> getFilmsByDirectorOrder(@PathVariable long directorId,
                                                     @RequestParam String sortBy) throws AccountNotFound {
         return filmService.getSortedFilmsByDirector(directorId, sortBy);
+    }
+
+    @GetMapping("/search")
+    public List<Film> search(@RequestParam String query, @RequestParam String by) {
+        return filmService.search(query, by);
     }
 }
