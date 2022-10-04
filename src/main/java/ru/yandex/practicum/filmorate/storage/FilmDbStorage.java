@@ -138,23 +138,15 @@ public class FilmDbStorage implements FilmStorage{
     }
 
     @Override
-    public List<Film> searchByTitle(String query) {
-        String sql = "SELECT * FROM films AS f " +
-                "JOIN mpa AS m ON f.mpa_id=m.id " +
-                "WHERE LOWER(name) LIKE '%' || ? || '%'";
-
-        return jdbcTemplate.query(sql, this::mapRowToFilm, query);
-    }
-
-    @Override
-    public List<Film> searchByDirector(String query) {
+    public List<Film> search(String title, String director) {
         String sql = "SELECT * FROM films " +
                 "JOIN mpa ON mpa.id = films.mpa_id " +
-                "JOIN film_directors ON films.id = film_directors.film_id " +
-                "JOIN directors ON directors.id = film_directors.director_id " +
-                "WHERE LOWER(directors.name) LIKE '%' || ? || '%'";
+                "LEFT JOIN film_directors ON films.id = film_directors.film_id " +
+                "LEFT JOIN directors ON directors.id = film_directors.director_id " +
+                "WHERE LOWER(films.name) LIKE '%' || ? || '%' " +
+                "OR LOWER(directors.name) LIKE '%' || ? || '%'";
 
-        return jdbcTemplate.query(sql, this::mapRowToFilm, query);
+        return jdbcTemplate.query(sql, this::mapRowToFilm, title, director);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int i) throws SQLException {

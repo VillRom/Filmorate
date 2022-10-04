@@ -105,12 +105,11 @@ public class FilmService {
         String newQuery = query.toLowerCase();
         List<Film> searched;
         if (param.equals("title")) {
-            searched = filmStorage.searchByTitle(newQuery);
+            searched = filmStorage.search(newQuery, null);
         } else if (param.equals("director")) {
-            searched = filmStorage.searchByDirector(newQuery);
+            searched = filmStorage.search(null, newQuery);
         } else {
-            searched = filmStorage.searchByDirector(newQuery);
-            searched.addAll(filmStorage.searchByTitle(newQuery));
+            searched = filmStorage.search(newQuery, newQuery);
         }
         searched.sort((o1, o2) -> o2.getLikes().size() - o1.getLikes().size());
 
