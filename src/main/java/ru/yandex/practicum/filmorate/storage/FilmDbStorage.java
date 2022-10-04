@@ -139,7 +139,7 @@ public class FilmDbStorage implements FilmStorage{
 
     @Override
     public List<Film> search(String title, String director) {
-        String sql = "SELECT * FROM films " +
+        String sql = "SELECT films.*, mpa.* FROM films " +
                 "JOIN mpa ON mpa.id = films.mpa_id " +
                 "LEFT JOIN film_directors ON films.id = film_directors.film_id " +
                 "LEFT JOIN directors ON directors.id = film_directors.director_id " +
