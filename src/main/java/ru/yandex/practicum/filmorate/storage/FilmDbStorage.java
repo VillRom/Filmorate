@@ -117,10 +117,45 @@ public class FilmDbStorage implements FilmStorage{
     }
 
     @Override
-    public List<Film> getFilms() {
+    public List<Film> getAllFilms() {
         String sql = "select * from films AS f JOIN mpa AS m " +
                 "ON f.mpa_id=m.id";
         return jdbcTemplate.query(sql, this::mapRowToFilm);
+    }
+
+    @Override
+    public List<Film> getSortedFilmsOrderCount(int count) {
+        String sql = "select f.*, m.* from films AS f JOIN mpa AS m ON f.mpa_id=m.id LEFT JOIN likes AS l ON f.id=l.id " +
+                "GROUP BY f.id ORDER BY COUNT(l.id) DESC LIMIT ?";
+        return jdbcTemplate.query(sql, this::mapRowToFilm, count);
+    }
+
+    @Override
+    public List<Film> getSortByYearFilmsOrderCount(int count, int year) {
+        String sql = "select f.*, m.* from films AS f JOIN mpa AS m ON f.mpa_id=m.id LEFT JOIN likes AS l ON f.id=l.id " +
+                "WHERE EXTRACT (YEAR FROM CAST(f.release_date AS date)) = ? " +
+                "GROUP BY f.id ORDER BY COUNT(l.id) DESC LIMIT ?";
+        return jdbcTemplate.query(sql, this::mapRowToFilm, year, count);
+    }
+
+    @Override
+    public List<Film> getSortByGenreFilmsOrderCount(int count, int idGenre) {
+        String sql = "select f.*, m.* from films AS f JOIN mpa AS m ON f.mpa_id=m.id " +
+                "JOIN film_genre AS fg ON f.id=fg.film_id " +
+                "LEFT JOIN likes AS l ON f.id=l.id " +
+                "WHERE fg.genre_id = ? " +
+                "GROUP BY f.id ORDER BY COUNT(l.id) DESC LIMIT ?";
+        return jdbcTemplate.query(sql, this::mapRowToFilm, idGenre, count);
+    }
+
+    @Override
+    public List<Film> getSortByGenreAndYearFilmsOrderCount(int count, int year, int idGenre) {
+        String sql = "select f.*, m.* from films AS f JOIN mpa AS m ON f.mpa_id=m.id " +
+                "JOIN film_genre AS fg ON f.id=fg.film_id " +
+                "LEFT JOIN likes AS l ON f.id=l.id " +
+                "WHERE EXTRACT (YEAR FROM CAST(f.release_date AS date)) = ? AND fg.genre_id = ? " +
+                "GROUP BY f.id ORDER BY COUNT(l.id) DESC LIMIT ?";
+        return jdbcTemplate.query(sql, this::mapRowToFilm, year, idGenre, count);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int i) throws SQLException {

@@ -34,9 +34,8 @@ public class FilmService {
     }
 
     public List<Film> getFilms() {
-        return filmStorage.getFilms();
+        return filmStorage.getAllFilms();
     }
-
 
     public Film updateFilm(Film film) throws AccountNotFound {
         if (filmStorage.getFilmById(film.getId()) != null) {
@@ -68,19 +67,15 @@ public class FilmService {
         log.info("Удален лайк пользователя с id-" + userId + " к фильму " + filmStorage.getFilmById(id));
     }
 
-    public List<Film> getSortedFilms(int count) {
-        List<Film> sortedFilms = filmStorage.getFilms();
-        sortedFilms.sort(new Comparator<Film>() {
-            @Override
-            public int compare(Film o1, Film o2) {
-                return o2.getLikes().size() - o1.getLikes().size();
-            }
-        });
-        if (sortedFilms.size() < count) {
-            return sortedFilms.subList(0, sortedFilms.size());
-        } else {
-            return sortedFilms.subList(0, count);
+    public List<Film> getSortedFilmsCount(int count, Integer year, Integer genreId) {
+        if (year == null & genreId != null) {
+            return filmStorage.getSortByGenreFilmsOrderCount(count, genreId);
+        } else if (year != null & genreId == null) {
+            return filmStorage.getSortByYearFilmsOrderCount(count, year);
+        } else if (year != null & genreId != null) {
+            return filmStorage.getSortByGenreAndYearFilmsOrderCount(count, year, genreId);
         }
+        return filmStorage.getSortedFilmsOrderCount(count);
     }
 
     public Film deleteFilm( long idFilm) throws AccountNotFound {
