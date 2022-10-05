@@ -35,7 +35,7 @@ public class FilmService {
     }
 
     public List<Film> getFilms() {
-        return filmStorage.getFilms();
+        return filmStorage.getAllFilms();
     }
 
 
@@ -70,7 +70,7 @@ public class FilmService {
     }
 
     public List<Film> getSortedFilms(int count) {
-        List<Film> sortedFilms = filmStorage.getFilms();
+        List<Film> sortedFilms = filmStorage.getAllFilms();
         sortedFilms.sort((o1, o2) -> o2.getLikes().size() - o1.getLikes().size());
         if (sortedFilms.size() < count) {
             return sortedFilms.subList(0, sortedFilms.size());
@@ -114,5 +114,16 @@ public class FilmService {
         searched.sort((o1, o2) -> o2.getLikes().size() - o1.getLikes().size());
 
         return searched;
+    }
+
+    public List<Film> getSortedFilmsCount(int count, Integer year, Integer genreId) {
+        if (year == null & genreId != null) {
+            return filmStorage.getSortByGenreFilmsOrderCount(count, genreId);
+        } else if (year != null & genreId == null) {
+            return filmStorage.getSortByYearFilmsOrderCount(count, year);
+        } else if (year != null & genreId != null) {
+            return filmStorage.getSortByGenreAndYearFilmsOrderCount(count, year, genreId);
+        }
+        return filmStorage.getSortedFilmsOrderCount(count);
     }
 }
