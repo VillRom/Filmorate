@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import validation.Validation;
@@ -68,6 +69,9 @@ public class UserService {
     }
 
     public List<User> getFriends(long id) {
+        if (userStorage.getUserFromId(id) == null) {
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
         List<User> listFriends = new ArrayList<>();
         for (long idFriend : userStorage.getSetListFriends(id)){
             listFriends.add(userStorage.getUserFromId(idFriend));

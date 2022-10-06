@@ -58,15 +58,15 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<User> deleteFriend(@PathVariable long id, @PathVariable long friendId)
+    public User deleteFriend(@PathVariable long id, @PathVariable long friendId)
             throws AccountNotFound {
         User delete = userService.getUserFromId(friendId);
         userService.deleteFriend(id, friendId);
-        return ResponseEntity.ok(delete);
+        return delete;
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<User> deleteUserById(@PathVariable long id) throws AccountNotFound {
-        return ResponseEntity.ok(userService.deleteUserById(id));
+    public User deleteUserById(@PathVariable long id) throws AccountNotFound {
+        return userService.deleteUserById(id);
     }
 }

@@ -33,11 +33,7 @@ public class Film {
     }
 
     public void setGenres(List<Genre> genreList) {
-        genreList.sort(new Comparator<Genre>() {
-            @Override
-            public int compare(Genre o1, Genre o2) {
-                return o1.getId() - o2.getId();
-            }});
+        genreList.sort((o1, o2) -> o1.getId() - o2.getId());
         genres.clear();
         genres.addAll(genreList);
     }

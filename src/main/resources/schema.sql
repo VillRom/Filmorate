@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS likes
 CREATE TABLE IF NOT EXISTS friends
 (
     user_id    INTEGER references users (user_id) ON DELETE CASCADE,
-    friends_id integer,
+    friends_id integer references users (user_id) ON DELETE CASCADE,
     status     boolean
 );
 

@@ -12,10 +12,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.sql.Date;
+import java.util.*;
 
 @Component("FilmDb")
 public class FilmDbStorage implements FilmStorage{
@@ -43,11 +41,11 @@ public class FilmDbStorage implements FilmStorage{
         film.setId(idFilm);
         if(!film.getGenres().isEmpty()) {
             fillingTableFilmGenre(idFilm, film.getGenres());
+            film.setGenres(getGenreToFilm(film.getId()));
         }
         if(!film.getDirectors().isEmpty()) {
             fillingTableFilmDirectors(idFilm, film.getDirectors());
         }
-
         return film;
     }
 
@@ -90,21 +88,13 @@ public class FilmDbStorage implements FilmStorage{
     }
 
     @Override
-    public List<Film> getSortByYearFilmsOrderCount(int count, int year) {
-        String sql = "select f.*, m.* from films AS f JOIN mpa AS m ON f.mpa_id=m.id LEFT JOIN likes AS l ON f.id=l.id " +
-                "WHERE EXTRACT (YEAR FROM CAST(f.release_date AS date)) = ? " +
-                "GROUP BY f.id ORDER BY COUNT(l.id) DESC LIMIT ?";
-        return jdbcTemplate.query(sql, this::mapRowToFilm, year, count);
-    }
-
-    @Override
-    public List<Film> getSortByGenreFilmsOrderCount(int count, int idGenre) {
+    public List<Film> getSortByGenreOrYearFilmsOrderCount(int count, Integer year, Integer idGenre) {
         String sql = "select f.*, m.* from films AS f JOIN mpa AS m ON f.mpa_id=m.id " +
                 "JOIN film_genre AS fg ON f.id=fg.film_id " +
                 "LEFT JOIN likes AS l ON f.id=l.id " +
-                "WHERE fg.genre_id = ? " +
+                "WHERE EXTRACT (YEAR FROM CAST(f.release_date AS date)) = ? OR fg.genre_id = ? " +
                 "GROUP BY f.id ORDER BY COUNT(l.id) DESC LIMIT ?";
-        return jdbcTemplate.query(sql, this::mapRowToFilm, idGenre, count);
+        return jdbcTemplate.query(sql, this::mapRowToFilm, year, idGenre, count);
     }
 
     @Override
