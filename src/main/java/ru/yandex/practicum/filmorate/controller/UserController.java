@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
+import java.util.List;
 
 
 @RestController
@@ -68,5 +69,10 @@ public class UserController {
     @DeleteMapping("/{id}")
     public User deleteUserById(@PathVariable long id) throws AccountNotFound {
         return userService.deleteUserById(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<FeedEvent> getFeedEventByUserId(@PathVariable Long id) {
+        return userService.getEventByUserId(id);
     }
 }

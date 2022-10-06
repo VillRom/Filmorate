@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.Event;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import validation.Validation;
 
@@ -17,13 +19,16 @@ import java.util.List;
 public class UserService {
     private final Validation validation = new Validation();
     private final UserStorage userStorage;
+    private final Event event;
 
     @Autowired
-    public UserService(@Qualifier("UserDb") UserStorage userStorage) {
+    public UserService(@Qualifier("UserDb") UserStorage userStorage, Event event) {
         this.userStorage = userStorage;
+        this.event = event;
     }
+
     public User createUser(User user) {
-        if (user.getName().isEmpty()) {
+        if (user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
         validation.validationUser(user);
@@ -35,7 +40,7 @@ public class UserService {
     public User updateUser(User user) throws AccountNotFound {
         if (userStorage.getUserFromId(user.getId()) != null) {
             validation.validationUser(user);
-            if (user.getName().isEmpty()) {
+            if (user.getName().isBlank()) {
                 user.setName(user.getLogin());
             }
             if (user.getId() < 0) {
@@ -64,6 +69,7 @@ public class UserService {
         if(id <= 0 || idFriend <= 0) {
             throw new AccountNotFound("Пользователи с id = " + id + " " + idFriend + " не найдены");
         } else {
+            event.addEvent(id, "FRIEND", "ADD", idFriend);
             userStorage.addFriend(id, idFriend);
         }
     }
@@ -98,6 +104,7 @@ public class UserService {
 
     public void deleteFriend(long id, long friendId) {
         userStorage.deleteFriend(id, friendId);
+        event.addEvent(id, "FRIEND", "REMOVE", friendId);
     }
 
     public User deleteUserById(long id) throws AccountNotFound {
@@ -108,5 +115,9 @@ public class UserService {
         userStorage.deleteUser(id);
         log.info("Удален пользователь user: {}", user);
         return user;
+    }
+
+    public List<FeedEvent> getEventByUserId(long userId) {
+        return  event.getEventById(userId);
     }
 }
