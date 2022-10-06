@@ -58,7 +58,7 @@ public class FilmDbStorageTest {
 
     @Test
     public void getFilmsTest() {
-        List<Film> filmList = filmDbStorage.getFilms();
+        List<Film> filmList = filmDbStorage.getAllFilms();
         Assertions.assertEquals(2, filmList.size(), "Длина списка не совпадает");
     }
 

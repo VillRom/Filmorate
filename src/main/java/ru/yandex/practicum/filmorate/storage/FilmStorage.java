@@ -11,7 +11,7 @@ public interface FilmStorage {
 
     void deleteFilm(long idFilm);
 
-    List<Film> getFilms();
+    List<Film> getAllFilms();
 
     Film getFilmById(long idFilm);
 
@@ -24,4 +24,10 @@ public interface FilmStorage {
     List<Film> getSortedFilmsByDirectorOrderLikes(long idDirector);
 
     List<Film> search(String title, String director);
+
+    List<Film> getSortedFilmsOrderCount(int count);
+
+    List<Film> getSortByGenreOrYearFilmsOrderCount(int count, Integer year, Integer idGenre);
+
+    List<Film> getSortByGenreAndYearFilmsOrderCount(int count, int year, int idGenre);
 }

@@ -64,11 +64,14 @@ public class UserDbStorageTest {
     @Test
     public void getUsersTest() {
         List<User> userList = userDbStorage.getUsers();
-        Assertions.assertEquals(1, userList.size(), "Длина списка не совпадает");
+        Assertions.assertEquals(2, userList.size(), "Длина списка не совпадает");
     }
 
     @Test
     public void addFriendTest() {
+        String sql = "INSERT INTO users (email, login, name, birthday_date)" + "VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(),
+                LocalDate.now());
         userDbStorage.addFriend(1,2);
         SqlRowSet friendRows = jdbcTemplate.queryForRowSet("select * from friends where user_id = ? ", 1);
         if(friendRows.next()) {

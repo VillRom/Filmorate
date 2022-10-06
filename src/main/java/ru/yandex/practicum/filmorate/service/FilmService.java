@@ -35,7 +35,7 @@ public class FilmService {
     }
 
     public List<Film> getFilms() {
-        return filmStorage.getFilms();
+        return filmStorage.getAllFilms();
     }
 
 
@@ -67,16 +67,6 @@ public class FilmService {
         }
         filmStorage.deleteLikeToFilm(id, userId);
         log.info("Удален лайк пользователя с id-" + userId + " к фильму " + filmStorage.getFilmById(id));
-    }
-
-    public List<Film> getSortedFilms(int count) {
-        List<Film> sortedFilms = filmStorage.getFilms();
-        sortedFilms.sort((o1, o2) -> o2.getLikes().size() - o1.getLikes().size());
-        if (sortedFilms.size() < count) {
-            return sortedFilms.subList(0, sortedFilms.size());
-        } else {
-            return sortedFilms.subList(0, count);
-        }
     }
 
     public Film deleteFilm(long idFilm) throws AccountNotFound {
@@ -114,5 +104,15 @@ public class FilmService {
         searched.sort((o1, o2) -> o2.getLikes().size() - o1.getLikes().size());
 
         return searched;
+    }
+
+    public List<Film> getSortedFilmsCount(int count, Integer year, Integer genreId) {
+        if (year != null & genreId != null) {
+            return filmStorage.getSortByGenreAndYearFilmsOrderCount(count, year, genreId);
+        } else if (year == null & genreId == null){
+            return filmStorage.getSortedFilmsOrderCount(count);
+        } else {
+            return filmStorage.getSortByGenreOrYearFilmsOrderCount(count, year, genreId);
+        }
     }
 }
