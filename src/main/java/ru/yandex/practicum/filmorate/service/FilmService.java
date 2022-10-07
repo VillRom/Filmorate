@@ -119,4 +119,11 @@ public class FilmService {
             return filmStorage.getSortByGenreOrYearFilmsOrderCount(count, year, genreId);
         }
     }
+
+    public List<Film> findCommon(int userId, int friendId) {
+        List<Film> common = filmStorage.findCommon(userId, friendId);
+        common.sort((o1, o2) -> o2.getLikes().size() - o1.getLikes().size());
+
+        return common;
+    }
 }
