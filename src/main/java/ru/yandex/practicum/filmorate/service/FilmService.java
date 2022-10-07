@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.Event;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import validation.Validation;
 
@@ -17,11 +18,12 @@ import java.util.*;
 public class FilmService {
     private final Validation validation;
     private final FilmStorage filmStorage;
-
     private final DirectorStorage directorStorage;
+    private final Event event;
 
     @Autowired
-    public FilmService(@Qualifier("FilmDb") FilmStorage filmStorage, DirectorStorage directorStorage) {
+    public FilmService(@Qualifier("FilmDb") FilmStorage filmStorage, DirectorStorage directorStorage, Event event) {
+        this.event = event;
         validation = new Validation();
         this.filmStorage = filmStorage;
         this.directorStorage = directorStorage;
@@ -58,6 +60,7 @@ public class FilmService {
 
     public void addLike(long id, long userId) {
         filmStorage.putLikeToFilm(id, userId);
+        event.addEvent(userId, "LIKE", "ADD", id);
         log.info("Добавлен лайк к фильму " + filmStorage.getFilmById(id));
     }
 
@@ -66,6 +69,7 @@ public class FilmService {
             throw new AccountNotFound("Пользователь с id = " + userId + " не найден");
         }
         filmStorage.deleteLikeToFilm(id, userId);
+        event.addEvent(userId, "LIKE", "REMOVE", id);
         log.info("Удален лайк пользователя с id-" + userId + " к фильму " + filmStorage.getFilmById(id));
     }
 

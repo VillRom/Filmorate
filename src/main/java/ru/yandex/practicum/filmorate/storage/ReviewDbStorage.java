@@ -6,6 +6,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.PreparedStatement;
@@ -18,8 +19,11 @@ public class ReviewDbStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public ReviewDbStorage(JdbcTemplate jdbcTemplate) {
+    private final EventDb eventDb;
+
+    public ReviewDbStorage(JdbcTemplate jdbcTemplate, EventDb eventDb) {
         this.jdbcTemplate = jdbcTemplate;
+        this.eventDb = eventDb;
     }
 
     @Override
@@ -37,7 +41,7 @@ public class ReviewDbStorage implements ReviewStorage {
             return statement;
         }, keyHolder);
         review.setReviewId(keyHolder.getKey().intValue());
-
+        eventDb.addEvent(review.getUserId(), "REVIEW", "ADD", review.getReviewId());
         return review;
     }
 
@@ -50,14 +54,18 @@ public class ReviewDbStorage implements ReviewStorage {
         if (result != 1) {
             throw new NotFoundException("Отзыв по ID " + review.getReviewId() + " не найден!");
         }
-
+        int userId = jdbcTemplate.queryForObject("SELECT user_id FROM REVIEWS WHERE REVIEW_ID = "
+                + review.getReviewId(), Integer.class);
+        eventDb.addEvent(userId, "REVIEW", "UPDATE", review.getReviewId());
         return review;
     }
 
     @Override
     public void delete(int id) {
+        Integer userId = jdbcTemplate.queryForObject("SELECT user_id FROM reviews WHERE REVIEW_ID = "
+                + id, Integer.class);
         String sqlQuery = "DELETE FROM REVIEWS WHERE REVIEW_ID = ?";
-
+        eventDb.addEvent(userId, "REVIEW", "REMOVE", id);
         jdbcTemplate.update(sqlQuery, id);
     }
 

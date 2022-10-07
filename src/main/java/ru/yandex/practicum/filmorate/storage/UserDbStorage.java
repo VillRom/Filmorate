@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component("UserDb")
-public class UserDbStorage implements UserStorage{
+public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
@@ -64,7 +64,7 @@ public class UserDbStorage implements UserStorage{
 
     @Override
     public User updateUser(User user) {
-        String sql = "UPDATE users SET " + "email = ?, login = ?, name = ?, birthday_date = ?" + "where user_id = ?";
+        String sql = "UPDATE users SET email = ?, login = ?, name = ?, birthday_date = ? where user_id = ?";
         jdbcTemplate.update(sql,user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
         return user;
     }
@@ -97,7 +97,7 @@ public class UserDbStorage implements UserStorage{
         }
     }
 
-    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException{
+    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getLong("user_id"))
                 .email(resultSet.getString("email"))
