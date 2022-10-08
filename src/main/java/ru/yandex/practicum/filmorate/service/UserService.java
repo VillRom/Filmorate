@@ -13,10 +13,9 @@ import ru.yandex.practicum.filmorate.storage.Event;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import validation.Validation;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -128,8 +127,8 @@ public class UserService {
         return  event.getEventById(userId);
     }
 
-    public Set<Film> getRecommendations(Long id, Integer count) {
-        List<Long> filmsId = userStorage.getRecommendations(id, count);
+    public Collection<Film> getRecommendations(Long id, Integer count) {
+        Collection<Long> filmsId = userStorage.getRecommendations(id, count);
         return filmsId.stream()
                 .map(filmStorage::getFilmById)
                 .collect(Collectors.toSet());

@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 
 @RestController
@@ -79,7 +78,7 @@ public class UserController {
     }
 
     @GetMapping("{id}/recommendations")
-    public Set<Film> getRecommendations(@PathVariable Long id,
+    public Collection<Film> getRecommendations(@PathVariable Long id,
                                         @RequestParam(required = false, defaultValue = "10") Integer count) {
         return userService.getRecommendations(id, count);
     }
