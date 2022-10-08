@@ -14,4 +14,5 @@ public interface UserStorage {
     public void addFriend(long id, long friendId);
     public Set<Long> getSetListFriends(long id);
     public void deleteFriend(long id, long friendId);
+    public List<Long> getRecommendations(Long id, Integer count);
 }
