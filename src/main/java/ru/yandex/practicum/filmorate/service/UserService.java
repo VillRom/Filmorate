@@ -128,6 +128,9 @@ public class UserService {
     }
 
     public Collection<Film> getRecommendations(Long id, Integer count) {
+        if (userStorage.getUserFromId(id) == null) {
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
         Collection<Long> filmsId = userStorage.getRecommendations(id, count);
         return filmsId.stream()
                 .map(filmStorage::getFilmById)
