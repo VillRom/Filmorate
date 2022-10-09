@@ -7,23 +7,29 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.FeedEvent;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.Event;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import validation.Validation;
-
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 public class UserService {
     private final Validation validation = new Validation();
     private final UserStorage userStorage;
+    private final FilmStorage filmStorage;
     private final Event event;
 
     @Autowired
-    public UserService(@Qualifier("UserDb") UserStorage userStorage, Event event) {
+    public UserService(@Qualifier("UserDb") UserStorage userStorage, FilmStorage filmStorage, Event event) {
         this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
         this.event = event;
     }
 
@@ -119,5 +125,15 @@ public class UserService {
 
     public List<FeedEvent> getEventByUserId(long userId) {
         return  event.getEventById(userId);
+    }
+
+    public Collection<Film> getRecommendations(Long id) {
+        if (userStorage.getUserFromId(id) == null) {
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
+        Collection<Long> filmsId = userStorage.getRecommendations(id);
+        return filmsId.stream()
+                .map(filmStorage::getFilmById)
+                .collect(Collectors.toSet());
     }
 }

@@ -9,9 +9,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.sql.Date;
+import java.util.*;
 
 @Component("UserDb")
 public class UserDbStorage implements UserStorage {
@@ -105,5 +104,22 @@ public class UserDbStorage implements UserStorage {
                 .name(resultSet.getString("name"))
                 .birthday(resultSet.getDate("birthday_date").toLocalDate())
                 .build();
+    }
+    @Override
+    public Collection<Long> getRecommendations(Long id) {
+
+        String sql = "SELECT id FROM likes l WHERE l.user_id IN (SELECT u.user_id FROM"
+                + " (SELECT l.user_id, COUNT(l.id) CNT FROM likes l, "
+                + " (SELECT l.user_id, COUNT(l.id) CNT FROM likes l GROUP BY l.user_id) m"
+                + " WHERE l.user_id = m.user_id AND l.id IN (SELECT id FROM likes WHERE user_id = ?)"
+                + " AND l.user_id <> ? GROUP BY l.user_id ORDER BY CNT DESC, m.CNT DESC) u LIMIT 1)"
+                + " AND l.id NOT IN (SELECT id FROM likes WHERE user_id = ?)";
+        List<Long> filmIds = new ArrayList<>();
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(sql, id, id, id);
+        while (rs.next()) {
+            filmIds.add(rs.getLong("id"));
+        }
+        return filmIds;
+
     }
 }
