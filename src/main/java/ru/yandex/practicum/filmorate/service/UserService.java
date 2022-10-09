@@ -127,11 +127,11 @@ public class UserService {
         return  event.getEventById(userId);
     }
 
-    public Collection<Film> getRecommendations(Long id, Integer count) {
+    public Collection<Film> getRecommendations(Long id) {
         if (userStorage.getUserFromId(id) == null) {
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
-        Collection<Long> filmsId = userStorage.getRecommendations(id, count);
+        Collection<Long> filmsId = userStorage.getRecommendations(id);
         return filmsId.stream()
                 .map(filmStorage::getFilmById)
                 .collect(Collectors.toSet());
