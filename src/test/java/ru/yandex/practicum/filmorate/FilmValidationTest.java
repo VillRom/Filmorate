@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import validation.Validation;
 
 import java.time.LocalDate;
@@ -15,13 +16,8 @@ public class FilmValidationTest {
 
     @BeforeEach
     public void createTestFilm() {
-        film = Film.builder()
-                .description("description")
-                .name("name")
-                .releaseDate(LocalDate.of(2001,06,05))
-                .duration(85)
-                .id(2)
-                .build();
+        film = new Film(2,"name", LocalDate.of(2001,06,05), "description",
+                85, new Mpa(1,"G"));
     }
 
     @Test

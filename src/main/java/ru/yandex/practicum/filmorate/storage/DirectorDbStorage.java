@@ -58,7 +58,6 @@ public class DirectorDbStorage implements DirectorStorage {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement statement = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                //statement.setLong(1, director.getId());
                 statement.setString(1, director.getName());
                 return statement;
             }

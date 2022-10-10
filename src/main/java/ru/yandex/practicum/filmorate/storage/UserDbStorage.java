@@ -106,7 +106,7 @@ public class UserDbStorage implements UserStorage {
                 .build();
     }
     @Override
-    public Collection<Long> getRecommendations(Long id) {
+    public List<Long> getRecommendations(Long id) {
 
         String sql = "SELECT id FROM likes l WHERE l.user_id IN (SELECT u.user_id FROM"
                 + " (SELECT l.user_id, COUNT(l.id) CNT FROM likes l, "

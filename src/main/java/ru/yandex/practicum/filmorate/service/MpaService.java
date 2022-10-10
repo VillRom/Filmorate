@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.MpaStorage;
 
-import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 
 @Service
@@ -19,9 +19,9 @@ public class MpaService {
         return mpaStorage.getAllMpa();
     }
 
-    public Mpa getMpa(int id) throws AccountNotFoundException {
+    public Mpa getMpa(int id) {
         if (id <= 0) {
-            throw new AccountNotFoundException();
+            throw new NotFoundException("Рейтинг с id " + id + " не найден");
         }
         return mpaStorage.getMpa(id);
     }

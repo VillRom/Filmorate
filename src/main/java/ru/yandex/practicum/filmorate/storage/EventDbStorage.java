@@ -7,14 +7,13 @@ import ru.yandex.practicum.filmorate.model.FeedEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.List;
 
 @Component
-public class EventDb implements Event {
+public class EventDbStorage implements EventFeedStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    public EventDb(JdbcTemplate jdbcTemplate) {
+    public EventDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

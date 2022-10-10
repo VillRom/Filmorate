@@ -6,7 +6,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.PreparedStatement;
@@ -19,11 +18,9 @@ public class ReviewDbStorage implements ReviewStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final EventDb eventDb;
 
-    public ReviewDbStorage(JdbcTemplate jdbcTemplate, EventDb eventDb) {
+    public ReviewDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.eventDb = eventDb;
     }
 
     @Override
@@ -41,7 +38,6 @@ public class ReviewDbStorage implements ReviewStorage {
             return statement;
         }, keyHolder);
         review.setReviewId(keyHolder.getKey().intValue());
-        eventDb.addEvent(review.getUserId(), "REVIEW", "ADD", review.getReviewId());
         return review;
     }
 
@@ -56,27 +52,23 @@ public class ReviewDbStorage implements ReviewStorage {
         }
         int userId = jdbcTemplate.queryForObject("SELECT user_id FROM REVIEWS WHERE REVIEW_ID = "
                 + review.getReviewId(), Integer.class);
-        eventDb.addEvent(userId, "REVIEW", "UPDATE", review.getReviewId());
+        review.setUserId(userId);
         return review;
     }
 
     @Override
-    public void delete(int id) {
+    public Integer delete(int id) {
         Integer userId = jdbcTemplate.queryForObject("SELECT user_id FROM reviews WHERE REVIEW_ID = "
                 + id, Integer.class);
         String sqlQuery = "DELETE FROM REVIEWS WHERE REVIEW_ID = ?";
-        eventDb.addEvent(userId, "REVIEW", "REMOVE", id);
         jdbcTemplate.update(sqlQuery, id);
+        return userId;
     }
 
     @Override
     public Review get(int id) {
         String sqlQuery = "SELECT * FROM REVIEWS WHERE REVIEW_ID = ?";
-        try {
             return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToReview, id);
-        } catch (DataAccessException e) {
-            throw new NotFoundException("Отзыв по ID " + id + " не найден!");
-        }
     }
 
     @Override
@@ -96,8 +88,8 @@ public class ReviewDbStorage implements ReviewStorage {
 
     private Review mapRowToReview(ResultSet resultSet, int rowNum) throws SQLException {
         Review review = new Review(resultSet.getString("content"),
-                resultSet.getInt("user_id"),
                 resultSet.getInt("film_id"));
+        review.setUserId(resultSet.getInt("user_id"));
         review.setReviewId(resultSet.getInt("review_id"));
         review.setUseful(resultSet.getInt("useful"));
         review.setIsPositive(resultSet.getBoolean("is_positive"));

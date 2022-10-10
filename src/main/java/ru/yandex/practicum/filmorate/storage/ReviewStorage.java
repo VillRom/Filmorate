@@ -6,15 +6,21 @@ import java.util.List;
 
 public interface ReviewStorage {
 
+    // Добавляем отзыв к фильму
     Review add(Review review);
 
+    // Обновляем отзыв
     Review update(Review review);
 
-    void delete(int id);
+    // Удаляем отзыв к фильму
+    Integer delete(int id);
 
+    // Возвращаем отзыв по индетификатору
     Review get(int id);
 
+    // Возвращаем список всех отзывов
     List<Review> getAll(int count);
 
+    // Возвращаем список всех отзывов к фильму id в кол-ве count
     List<Review> getForFilm(int id, int count);
 }

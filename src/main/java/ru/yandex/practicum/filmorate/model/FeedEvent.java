@@ -1,12 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-import java.sql.Timestamp;
-
-@Data
 @Builder
+@Getter
+@Setter
 public class FeedEvent {
     private long eventId;
     private long timestamp;

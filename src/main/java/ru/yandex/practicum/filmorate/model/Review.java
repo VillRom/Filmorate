@@ -16,34 +16,10 @@ public class Review {
     private  Boolean isPositive;
 
     @NotNull
-    private final Integer userId;
+    private Integer userId;
 
     @NotNull
     private final Integer filmId;
 
     private int useful;
-
-    public int getReviewId() {
-        return reviewId;
-    }
-
-    public void setReviewId(int reviewId) {
-        this.reviewId = reviewId;
-    }
-
-    public int getUseful() {
-        return useful;
-    }
-
-    public void setUseful(int useful) {
-        this.useful = useful;
-    }
-
-    public boolean getIsPositive() {
-        return isPositive;
-    }
-
-    public void setIsPositive(boolean positive) {
-        isPositive = positive;
-    }
 }

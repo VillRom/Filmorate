@@ -4,10 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
-import ru.yandex.practicum.filmorate.storage.Event;
+import ru.yandex.practicum.filmorate.storage.EventFeedStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import validation.Validation;
 
@@ -16,13 +16,19 @@ import java.util.*;
 @Slf4j
 @Service
 public class FilmService {
+
     private final Validation validation;
+
     private final FilmStorage filmStorage;
+
     private final DirectorStorage directorStorage;
-    private final Event event;
+
+    private final EventFeedStorage event;
+
 
     @Autowired
-    public FilmService(@Qualifier("FilmDb") FilmStorage filmStorage, DirectorStorage directorStorage, Event event) {
+    public FilmService(@Qualifier("FilmDb") FilmStorage filmStorage, DirectorStorage directorStorage,
+                       EventFeedStorage event) {
         this.event = event;
         validation = new Validation();
         this.filmStorage = filmStorage;
@@ -41,19 +47,19 @@ public class FilmService {
     }
 
 
-    public Film updateFilm(Film film) throws AccountNotFound {
+    public Film updateFilm(Film film) {
         if (filmStorage.getFilmById(film.getId()) != null) {
             validation.validationFilm(film);
             log.info("Обновлен фильм film: {}", filmStorage.getFilmById(film.getId()));
             return filmStorage.updateFilm(film);
         } else {
-            throw new AccountNotFound("Фильм с id = " + film.getId() + " не найден");
+            throw new NotFoundException("Фильм с id = " + film.getId() + " не найден");
         }
     }
 
-    public Film getFilmById(long idFilm) throws AccountNotFound {
+    public Film getFilmById(long idFilm) {
         if (filmStorage.getFilmById(idFilm) == null) {
-            throw new AccountNotFound("Фильм с id = " + idFilm + " не найден");
+            throw new NotFoundException("Фильм с id = " + idFilm + " не найден");
         }
         return filmStorage.getFilmById(idFilm);
     }
@@ -64,18 +70,18 @@ public class FilmService {
         log.info("Добавлен лайк к фильму " + filmStorage.getFilmById(id));
     }
 
-    public void deleteLike(long id, long userId) throws AccountNotFound {
+    public void deleteLike(long id, long userId) {
         if (userId <= 0) {
-            throw new AccountNotFound("Пользователь с id = " + userId + " не найден");
+            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
         filmStorage.deleteLikeToFilm(id, userId);
         event.addEvent(userId, "LIKE", "REMOVE", id);
         log.info("Удален лайк пользователя с id-" + userId + " к фильму " + filmStorage.getFilmById(id));
     }
 
-    public Film deleteFilm(long idFilm) throws AccountNotFound {
+    public Film deleteFilm(long idFilm) {
         if (filmStorage.getFilmById(idFilm) == null) {
-            throw new AccountNotFound("Фильм с id = " + idFilm + " не найден");
+            throw new NotFoundException("Фильм с id = " + idFilm + " не найден");
         }
         Film film = filmStorage.getFilmById(idFilm);
         filmStorage.deleteFilm(idFilm);
@@ -83,9 +89,9 @@ public class FilmService {
         return film;
     }
 
-    public List<Film> getSortedFilmsByDirector(long idDirector, String sort) throws AccountNotFound {
+    public List<Film> getSortedFilmsByDirector(long idDirector, String sort) {
         if (directorStorage.getDirector(idDirector) == null) {
-            throw new AccountNotFound("Режисер с id = " + idDirector + " не найден");
+            throw new NotFoundException("Режисер с id = " + idDirector + " не найден");
         }
         if (sort.equals("year")) {
             return filmStorage.getSortedFilmsByDirectorOrderYear(idDirector);

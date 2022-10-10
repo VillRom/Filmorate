@@ -4,12 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.FeedEvent;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.Event;
+import ru.yandex.practicum.filmorate.storage.EventFeedStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import validation.Validation;
@@ -21,13 +20,18 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserService {
+
     private final Validation validation = new Validation();
+
     private final UserStorage userStorage;
+
     private final FilmStorage filmStorage;
-    private final Event event;
+
+    private final EventFeedStorage event;
+
 
     @Autowired
-    public UserService(@Qualifier("UserDb") UserStorage userStorage, FilmStorage filmStorage, Event event) {
+    public UserService(@Qualifier("UserDb") UserStorage userStorage, FilmStorage filmStorage, EventFeedStorage event) {
         this.userStorage = userStorage;
         this.filmStorage = filmStorage;
         this.event = event;
@@ -43,19 +47,16 @@ public class UserService {
         return user;
     }
 
-    public User updateUser(User user) throws AccountNotFound {
-        if (userStorage.getUserFromId(user.getId()) != null) {
+    public User updateUser(User user) {
+        if (userStorage.getUserFromId(user.getId()) != null && user.getId() > 0) {
             validation.validationUser(user);
             if (user.getName().isBlank()) {
                 user.setName(user.getLogin());
             }
-            if (user.getId() < 0) {
-                throw new AccountNotFound("Пользователь с id = " + user.getId() + " не найден");
-            }
             userStorage.updateUser(user);
             log.info("Обновлен пользователь user: {}", userStorage.getUserFromId(user.getId()));
         } else {
-            throw new AccountNotFound("Пользователь с id = " + user.getId() + " не найден");
+            throw new NotFoundException("Пользователь с id = " + user.getId() + " не найден");
         }
         return user;
     }
@@ -64,19 +65,20 @@ public class UserService {
         return userStorage.getUsers();
     }
 
-    public User getUserFromId(long userId) throws AccountNotFound {
+    public User getUserFromId(long userId) {
         if (userStorage.getUserFromId(userId) == null) {
-            throw new AccountNotFound("Пользователь с id = " + userId + " не найден");
+            throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
         return userStorage.getUserFromId(userId);
     }
 
-    public void addFriend(long id, long idFriend) throws AccountNotFound {
+    public void addFriend(long id, long idFriend) {
         if(id <= 0 || idFriend <= 0) {
-            throw new AccountNotFound("Пользователи с id = " + id + " " + idFriend + " не найдены");
+            throw new NotFoundException("Пользователи с id = " + id + " " + idFriend + " не найдены");
         } else {
             event.addEvent(id, "FRIEND", "ADD", idFriend);
             userStorage.addFriend(id, idFriend);
+            log.info("Пользователь с id " + idFriend + " добавлен в друзья пользователя с id " + id);
         }
     }
 
@@ -110,12 +112,13 @@ public class UserService {
 
     public void deleteFriend(long id, long friendId) {
         userStorage.deleteFriend(id, friendId);
+        log.info("Пользователь с id " + friendId + " удален из друзей пользователя с id " + id);
         event.addEvent(id, "FRIEND", "REMOVE", friendId);
     }
 
-    public User deleteUserById(long id) throws AccountNotFound {
+    public User deleteUserById(long id) {
         if (userStorage.getUserFromId(id) == null) {
-            throw new AccountNotFound("Пользователь с id = " + id + " не найден");
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
         User user = userStorage.getUserFromId(id);
         userStorage.deleteUser(id);
@@ -131,7 +134,7 @@ public class UserService {
         if (userStorage.getUserFromId(id) == null) {
             throw new NotFoundException("Пользователь с id = " + id + " не найден");
         }
-        Collection<Long> filmsId = userStorage.getRecommendations(id);
+        List<Long> filmsId = userStorage.getRecommendations(id);
         return filmsId.stream()
                 .map(filmStorage::getFilmById)
                 .collect(Collectors.toSet());
