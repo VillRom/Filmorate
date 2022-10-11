@@ -5,17 +5,10 @@ import lombok.*;
 @Builder
 @EqualsAndHashCode
 @ToString
+@Getter
 public class Genre {
 
     private final Integer id;
 
     private final String name;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
 }

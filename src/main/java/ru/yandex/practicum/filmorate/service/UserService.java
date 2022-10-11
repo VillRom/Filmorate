@@ -27,14 +27,15 @@ public class UserService {
 
     private final FilmStorage filmStorage;
 
-    private final EventFeedStorage event;
+    private final EventFeedStorage eventFeedStorage;
 
 
     @Autowired
-    public UserService(@Qualifier("UserDb") UserStorage userStorage, FilmStorage filmStorage, EventFeedStorage event) {
+    public UserService(@Qualifier("UserDb") UserStorage userStorage, FilmStorage filmStorage,
+                       EventFeedStorage eventFeedStorage) {
         this.userStorage = userStorage;
         this.filmStorage = filmStorage;
-        this.event = event;
+        this.eventFeedStorage = eventFeedStorage;
     }
 
     public User createUser(User user) {
@@ -76,7 +77,7 @@ public class UserService {
         if(id <= 0 || idFriend <= 0) {
             throw new NotFoundException("Пользователи с id = " + id + " " + idFriend + " не найдены");
         } else {
-            event.addEvent(id, "FRIEND", "ADD", idFriend);
+            eventFeedStorage.addEvent(id, "FRIEND", "ADD", idFriend);
             userStorage.addFriend(id, idFriend);
             log.info("Пользователь с id " + idFriend + " добавлен в друзья пользователя с id " + id);
         }
@@ -113,7 +114,7 @@ public class UserService {
     public void deleteFriend(long id, long friendId) {
         userStorage.deleteFriend(id, friendId);
         log.info("Пользователь с id " + friendId + " удален из друзей пользователя с id " + id);
-        event.addEvent(id, "FRIEND", "REMOVE", friendId);
+        eventFeedStorage.addEvent(id, "FRIEND", "REMOVE", friendId);
     }
 
     public User deleteUserById(long id) {
@@ -127,7 +128,7 @@ public class UserService {
     }
 
     public List<FeedEvent> getEventByUserId(long userId) {
-        return  event.getEventById(userId);
+        return  eventFeedStorage.getEventById(userId);
     }
 
     public Collection<Film> getRecommendations(Long id) {
