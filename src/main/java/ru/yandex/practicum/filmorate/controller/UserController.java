@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.AccountNotFound;
+import ru.yandex.practicum.filmorate.model.FeedEvent;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
+import java.util.List;
 
 
 @RestController
@@ -27,7 +28,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public User getUserFromId(@PathVariable long id) throws AccountNotFound {
+    public User getUserFromId(@PathVariable long id) {
         return userService.getUserFromId(id);
     }
 
@@ -47,26 +48,35 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@RequestBody User user) throws AccountNotFound {
+    public User updateUser(@RequestBody User user) {
         return userService.updateUser(user);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable long id, @PathVariable long friendId) throws AccountNotFound {
+    public User addFriend(@PathVariable long id, @PathVariable long friendId) {
         userService.addFriend(id, friendId);
         return userService.getUserFromId(friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public ResponseEntity<User> deleteFriend(@PathVariable long id, @PathVariable long friendId)
-            throws AccountNotFound {
+    public User deleteFriend(@PathVariable long id, @PathVariable long friendId) {
         User delete = userService.getUserFromId(friendId);
         userService.deleteFriend(id, friendId);
-        return ResponseEntity.ok(delete);
+        return delete;
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<User> deleteUserById(@PathVariable long id) throws AccountNotFound {
-        return ResponseEntity.ok(userService.deleteUserById(id));
+    public User deleteUserById(@PathVariable long id) {
+        return userService.deleteUserById(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<FeedEvent> getFeedEventByUserId(@PathVariable Long id) {
+        return userService.getEventByUserId(id);
+    }
+
+    @GetMapping("{id}/recommendations")
+    public Collection<Film> getRecommendations(@PathVariable Long id) {
+        return userService.getRecommendations(id);
     }
 }

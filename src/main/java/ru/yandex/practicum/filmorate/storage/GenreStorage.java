@@ -7,6 +7,10 @@ import java.util.List;
 
 
 public interface GenreStorage {
-    public List<Genre> getAllGenre();
-    public Genre getGenreById(Integer id) throws AccountNotFoundException;
+
+    // Возвращает список всех жанров
+    List<Genre> getAllGenre();
+
+    // Возвращает жанр по индетификатору id
+    Genre getGenreById(Integer id);
 }
