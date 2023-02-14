@@ -1,5 +1,5 @@
 # java-filmorate
-![Filmorate SQL](images\filmorateDb.png)
+![Filmorate SQL](https://github.com/VillRom/Filmorate/blob/main/images/filmorateDb.png)
 
 В проекте реализован следующий функционал:
 1) «Отзывы» - Возможность добавлять, обновлять и удалять отзывы к фильмам. 
