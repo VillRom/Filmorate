@@ -1,7 +1,18 @@
-# java-filmorate
-![Filmorate SQL](https://github.com/VillRom/Filmorate/blob/main/images/filmorateDb.png)
+# Filmorate
 
-В проекте реализован следующий функционал:
+Filmorate - монолитное spring-boot приложение для работы с фильмами и оценками пользователей.
+
+---
+<details><summary><b>Структура проекта</b></summary>
+<img src="https://github.com/VillRom/Filmorate/blob/main/images/filmorateDb.png" alt="Здесь была картинка">
+</details>
+
+---
+
+
+
+<details><summary><b>Описание функционала программы</b></summary>
+
 1) «Отзывы» - Возможность добавлять, обновлять и удалять отзывы к фильмам. 
    Характеристики отзыва:
    1. Оценка — полезно/бесполезно.
@@ -27,4 +38,18 @@ N - это кол-во выводимых фильмов.
 Фильтрация осуществляется по двум параметрам:
    1. По жанру.
    2. За указанный год.
+</details>
+
+#### Стек-технологий, используемый в приложении:
+- [Java 11](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html)
+- [Spring Boot 2.7.2](https://docs.spring.io/spring-boot/docs/2.7.2/api/)
+- [Maven](https://maven.apache.org/)
+- [Lombok](https://projectlombok.org/)
+- [DBMS H2](http://www.h2database.com/html/main.html)
+- Для командной работы использовался [Notion](https://www.notion.so)
+
+#### Команда разработки:
+- [GSBoldyrev](https://github.com/GSBoldyrev)
+- [Lnepostbox](https://github.com/Lnepostbox)
+- [VillRom](https://github.com/VillRom)
 
