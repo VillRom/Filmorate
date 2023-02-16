@@ -4,7 +4,7 @@ Filmorate - монолитное spring-boot приложение для раб�
 
 ---
 <details><summary><b>Структура проекта</b></summary>
-<img src="https://github.com/VillRom/Filmorate/blob/main/images/filmorateDb.jpg" alt="Здесь была картинка">
+<img src="https://github.com/VillRom/Filmorate/blob/main/images/filmorateDb.png" alt="Здесь была картинка">
 </details>
 
 ---
